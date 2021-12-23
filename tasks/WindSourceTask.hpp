@@ -1,11 +1,10 @@
-#ifndef gazebo_usv_WindSourceTask_TASK_HPP
-#define gazebo_usv_WindSourceTask_TASK_HPP
+#ifndef GAZEBO_USV_WindSourceTask_TASK_HPP
+#define GAZEBO_USV_WindSourceTask_TASK_HPP
 
 #include "gazebo_usv/WindSourceTaskBase.hpp"
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
-#include <base/samples/RigidBodyState.hpp>
 
 namespace gazebo_usv{
 
@@ -32,9 +31,6 @@ namespace gazebo_usv{
         std::string mModelName;
         gazebo::transport::NodePtr mNode;
         gazebo::transport::PublisherPtr mWindVelocityPublisher;
-        gazebo::transport::PublisherPtr mVesselOrientationPublisher;
-        gazebo::transport::PublisherPtr mVesselVelocityPublisher;
-
     public:
         void setGazeboModel( std::string const& pluginName, ModelPtr model );
 

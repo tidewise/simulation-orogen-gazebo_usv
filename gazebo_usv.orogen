@@ -9,17 +9,9 @@ import_types_from "base"
 
 using_library "gazebo"
 using_library "base-logging"
+using_task_library "rock_gazebo"
 
-task_context 'BaseTask' do
-    needs_configuration
-
-    # Controls whether the components should use the simulation time (the
-    # default) or wall-clock time
-    property 'use_sim_time', '/bool', true
-end
-
-
-task_context 'WindSourceTask', subclasses: 'BaseTask' do
+task_context 'WindSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
     needs_configuration
 
     exception_states 'NO_TOPIC_CONNECTION'
