@@ -22,3 +22,13 @@ task_context 'WindSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
     # Wind velocity input port
     input_port 'wind_velocity', '/base/Vector3d'
 end
+
+task_context "DirectForceApplicationTask", subclasses: "rock_gazebo::ModelPluginTask" do
+    needs_configuration
+
+    # The link name follows the format: "${model}/${link}"
+    property "link_name", "/std/string"
+
+    # The force, as a vector, to be applied on ${link_name}
+    input_port "force", "/base/Vector3d"
+end
