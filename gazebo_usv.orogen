@@ -32,3 +32,26 @@ task_context "DirectForceApplicationTask", subclasses: "rock_gazebo::ModelPlugin
     # The force, as a vector, to be applied on ${link_name}
     input_port "force", "/base/Vector3d"
 end
+
+task_context 'TetherSimulationTask', subclasses: 'rock_gazebo::ModelPLuginTask' do
+    needs_configuration
+
+    exception_states 'NO_TOPIC_CONNECTION'
+
+    #Plugin full name
+    attribute 'name', '/std/string'
+
+    #Property
+    property 'tether_length', '/double'
+
+    #Input Port
+    input_port 'rov2world_pose', '/base/samples/RigidBodyState'
+    input_port 'usv2world_pose', '/base/samples/RigidBodyState'
+    input_port 'water_speed', '/base/Vector3d'
+
+    #Output Port
+    output_port 'rov_force', 'base/Vector3d'
+    output_port 'usv_force', '/base/Vector3d'
+
+    periodic 0.1
+end
