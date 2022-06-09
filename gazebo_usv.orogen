@@ -9,6 +9,8 @@ import_types_from "base"
 
 using_library "gazebo"
 using_library "base-logging"
+using_library "uuv_tether_control"
+import_types_from "uuv_tether_control/TetherDragAndInertiaConfig.hpp"
 using_task_library "rock_gazebo"
 
 task_context 'WindSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
@@ -36,13 +38,9 @@ end
 task_context 'TetherSimulationTask', subclasses: 'rock_gazebo::ModelPLuginTask' do
     needs_configuration
 
-    exception_states 'NO_TOPIC_CONNECTION'
-
-    #Plugin full name
-    attribute 'name', '/std/string'
-
     #Property
-    property 'tether_length', '/double'
+    property 'max_tether_length', '/double'
+    property 'tether_config', '/uuv_tether_control/TetherDragAndInertiaConfig'
 
     #Input Port
     input_port 'rov2world_pose', '/base/samples/RigidBodyState'
@@ -53,5 +51,5 @@ task_context 'TetherSimulationTask', subclasses: 'rock_gazebo::ModelPLuginTask' 
     output_port 'rov_force', 'base/Vector3d'
     output_port 'usv_force', '/base/Vector3d'
 
-    periodic 0.1
+    port_driven
 end

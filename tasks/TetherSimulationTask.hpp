@@ -4,6 +4,9 @@
 #define GAZEBO_USV_TETHERSIMULATIONTASK_TASK_HPP
 
 #include "gazebo_usv/TetherSimulationTaskBase.hpp"
+#include "base/Eigen.hpp"
+#include "base/samples/RigidBodyState.hpp"
+#include "uuv_tether_control/TetherDragAndInertia.hpp"
 
 namespace gazebo_usv{
 
@@ -24,11 +27,14 @@ namespace gazebo_usv{
     class TetherSimulationTask : public TetherSimulationTaskBase
     {
 	friend class TetherSimulationTaskBase;
-    protected:
 
-
+    private:
+        double mMaxTetherLength;
+	uuv_tether_control::TetherDragAndInertiaConfig mConfig;
+	uuv_tether_control::TetherDragAndInertia mTether;
 
     public:
+	
         /** TaskContext constructor for TetherSimulationTask
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
          * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.

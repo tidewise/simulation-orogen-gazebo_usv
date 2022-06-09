@@ -8,4 +8,5 @@
   <logo>http://</logo>
   <depend package="base/cmake" />
   <depend package="simulation/orogen/rock_gazebo"/>
+  <depend package="control/uuv_tether_control"/>
 </package>
