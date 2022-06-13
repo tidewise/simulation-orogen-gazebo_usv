@@ -27,10 +27,10 @@ namespace gazebo_usv{
     class TetherSimulationTask : public TetherSimulationTaskBase
     {
 	friend class TetherSimulationTaskBase;
+	uuv_tether_control::TetherDragAndInertiaConfig mConfig;
 
     private:
         double mMaxTetherLength;
-	uuv_tether_control::TetherDragAndInertiaConfig mConfig;
 	uuv_tether_control::TetherDragAndInertia mTether;
 
     public:
