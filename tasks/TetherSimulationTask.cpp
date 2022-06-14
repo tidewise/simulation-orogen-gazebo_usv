@@ -71,8 +71,7 @@ void TetherSimulationTask::updateHook()
 
     // Setting the state of the tether
     TetherDragAndInertiaState state;
-    state = mTether.getState();
-//    mState = mTether.computeTetherState(mConfig, usv_pose, rov_pose, water_velocity, tether_length);
+    state = mTether.computeTetherState(mConfig, usv_pose, rov_pose, water_velocity, tether_length);
 
     // Calculating the drag effect reflected on the tether
     base::Vector3d tether_drag_effect;
