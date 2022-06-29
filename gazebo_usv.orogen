@@ -36,7 +36,7 @@ task_context "DirectForceApplicationTask", subclasses: "rock_gazebo::ModelPlugin
     input_port "force", "/base/Vector3d"
 end
 
-task_context 'TetherSimulationTask', subclasses: 'rock_gazebo::ModelPLuginTask' do
+task_context 'TetherSimulationTask' do
     needs_configuration
 
     # The max length that the tether can achieve
