@@ -9,7 +9,7 @@ describe OroGen.gazebo_usv.TetherSimulationTask do
 
     attr_reader :task
 
-    before do # rubocop:disable Metrics/BlockLength
+    before do
         @task = syskit_deploy(
             OroGen.gazebo_usv
                   .TetherSimulationTask
@@ -17,7 +17,8 @@ describe OroGen.gazebo_usv.TetherSimulationTask do
         )
 
         @task.properties.max_tether_length = 150
-        @task.properties.tether_config = Types.uuv_tether_control.TetherDragAndInertiaConfig.new
+        @task.properties.tether_config = \
+            Types.uuv_tether_control.TetherDragAndInertiaConfig.new
         @task.properties.tether_config.zero!
         @task.properties.tether_config.saltwater_density = 1023
         @task.properties.tether_config.mass_per_unit_length = 0
@@ -36,7 +37,6 @@ describe OroGen.gazebo_usv.TetherSimulationTask do
         @usv_pose.velocity = Eigen::Vector3.Zero
 
         @water_velocity = Eigen::Vector3.new(-5, 0, 0)
-
     end
 
     it "returns tether force " do
@@ -47,10 +47,10 @@ describe OroGen.gazebo_usv.TetherSimulationTask do
             syskit_write task.usv_attachment_port, @usv_pose
             syskit_write task.water_speed_port, @water_velocity
         end.to do
-        [
-            have_one_new_sample(task.rov_force_port),
-            have_one_new_sample(task.usv_force_port)
-        ]
+            [
+                have_one_new_sample(task.rov_force_port),
+                have_one_new_sample(task.usv_force_port)
+            ]
         end
 
         assert_equal(810.216, output[0].x)
@@ -60,6 +60,5 @@ describe OroGen.gazebo_usv.TetherSimulationTask do
         assert_equal(-810.216, output[1].x)
         assert_equal(0, output[1].y)
         assert_equal(0, output[1].z)
-
     end
 end
