@@ -78,14 +78,14 @@ void TetherSimulationTask::updateHook()
     tether_drag_effect = mTether.computeTetherDrag(mConfig, state);
 
     // Calculating the tether force in the rov and the usv (at this time, we are just considering the drag effect)
-    base::Vector3d rov_force;
-    base::Vector3d usv_force;
-    rov_force = - tether_drag_effect/2;
-    usv_force = tether_drag_effect/2;
+    base::Vector3d rov_total_force;
+    base::Vector3d usv_total_force;
+    rov_total_force = - tether_drag_effect/2;
+    usv_total_force = tether_drag_effect/2;
 
     // Writing on the output ports
-    _rov_force.write(rov_force);
-    _usv_force.write(usv_force);
+    _rov_force.write(rov_total_force);
+    _usv_force.write(usv_total_force);
 
     TetherSimulationTaskBase::updateHook();
 }
