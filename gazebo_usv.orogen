@@ -9,6 +9,9 @@ import_types_from "base"
 
 using_library "gazebo"
 using_library "base-logging"
+using_library "uuv_tether_control"
+import_types_from "uuv_tether_control/TetherDragAndInertiaConfig.hpp"
+import_types_from "uuv_tether_control/TetherDragAndInertiaState.hpp"
 using_task_library "rock_gazebo"
 
 task_context 'WindSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
@@ -31,4 +34,28 @@ task_context "DirectForceApplicationTask", subclasses: "rock_gazebo::ModelPlugin
 
     # The force, as a vector, to be applied on ${link_name}
     input_port "force", "/base/Vector3d"
+end
+
+task_context 'TetherSimulationTask' do
+    needs_configuration
+
+    # The max length that the tether can achieve
+    property 'max_tether_length', '/double'
+
+    property 'tether_config', '/uuv_tether_control/TetherDragAndInertiaConfig'
+    
+    # The rov's link where the tether is attached
+    input_port 'rov_attachment', '/base/samples/RigidBodyState'
+
+    # The usv's link where the tether is attached   
+    input_port 'usv_attachment', '/base/samples/RigidBodyState'
+   
+    # Water speed over ground, expressed in the rov 
+    input_port 'water_speed', '/base/Vector3d'
+
+    output_port 'rov_force', 'base/Vector3d'
+   
+    output_port 'usv_force', '/base/Vector3d'
+
+    port_driven
 end
