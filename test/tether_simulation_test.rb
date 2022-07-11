@@ -53,11 +53,11 @@ describe OroGen.gazebo_usv.TetherSimulationTask do
             ]
         end
 
-        assert_equal(810.216, output[0].x)
+        assert_equal(405.108, output[0].x)
         assert_equal(0, output[0].y)
         assert_equal(0, output[0].z)
 
-        assert_equal(-810.216, output[1].x)
+        assert_equal(-405.108, output[1].x)
         assert_equal(0, output[1].y)
         assert_equal(0, output[1].z)
     end
