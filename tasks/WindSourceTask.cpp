@@ -53,13 +53,11 @@ void WindSourceTask::updateHook()
     base::Vector3d wind_velocity;
     if (_wind_velocity.read(wind_velocity) != RTT::NewData)
         return;
-    
     gazebo::msgs::Vector3d wind_vel_msg;
     wind_vel_msg.set_x(wind_velocity.x());
     wind_vel_msg.set_y(wind_velocity.y());
     wind_vel_msg.set_z(wind_velocity.z());
     mWindVelocityPublisher->Publish(wind_vel_msg);
-    
     WindSourceTaskBase::updateHook();
 }
 void WindSourceTask::errorHook()
@@ -68,6 +66,11 @@ void WindSourceTask::errorHook()
 }
 void WindSourceTask::stopHook()
 {
+    gazebo::msgs::Vector3d wind_vel_msg;
+    wind_vel_msg.set_x(0);
+    wind_vel_msg.set_y(0);
+    wind_vel_msg.set_z(0);
+    mWindVelocityPublisher->Publish(wind_vel_msg);
     WindSourceTaskBase::stopHook();
 }
 void WindSourceTask::cleanupHook()
