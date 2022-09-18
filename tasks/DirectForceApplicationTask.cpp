@@ -22,7 +22,7 @@ DirectForceApplicationTask::~DirectForceApplicationTask()
 void DirectForceApplicationTask::setGazeboModel(std::string const& pluginName, gazebo::physics::ModelPtr model) {
     std::string worldName = model->GetWorld()->Name();
 
-    std::string taskName = "gazebo:" + worldName + ":" + model->GetName() + ":" + pluginName;
+    std::string taskName = "gazebo::" + worldName + "::" + model->GetName() + "::" + pluginName;
     provides()->setName(taskName);
 }
 

@@ -35,7 +35,7 @@ void WindSourceTask::setGazeboModel(std::string const &pluginName, ModelPtr mode
 {
     string worldName = model->GetWorld()->Name();
 
-    string taskName = "gazebo:" + worldName + ":" + model->GetName() + ":" + pluginName;
+    string taskName = "gazebo::" + worldName + "::" + model->GetName() + "::" + pluginName;
     provides()->setName(taskName);
     _name.set(taskName);
 
