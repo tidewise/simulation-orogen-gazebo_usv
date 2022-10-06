@@ -1,7 +1,7 @@
-#ifndef GAZEBO_USV_WindSourceTask_TASK_HPP
-#define GAZEBO_USV_WindSourceTask_TASK_HPP
+#ifndef GAZEBO_USV_WaveSourceTask_TASK_HPP
+#define GAZEBO_USV_WaveSourceTask_TASK_HPP
 
-#include "gazebo_usv/WindSourceTaskBase.hpp"
+#include "gazebo_usv/WaveSourceTaskBase.hpp"
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
@@ -9,7 +9,7 @@
 
 namespace gazebo_usv{
 
-    /*! \class WindSourceTask
+    /*! \class WaveSourceTask
      * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
      * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
      * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
@@ -18,32 +18,33 @@ namespace gazebo_usv{
      * The name of a TaskContext is primarily defined via:
      \verbatim
      deployment 'deployment_name'
-         task('custom_task_name','gazebo_usv::WindSourceTask')
+         task('custom_task_name','gazebo_usv::WaveSourceTask')
      end
      \endverbatim
      *  It can be dynamically adapted when the deployment is called with a prefix argument.
      */
-    class WindSourceTask : public WindSourceTaskBase
+    class WaveSourceTask : public WaveSourceTaskBase
     {
-        friend class WindSourceTaskBase;
+        friend class WaveSourceTaskBase;
         typedef gazebo::physics::ModelPtr ModelPtr;
 
     protected:
         std::string mModelName;
         gazebo::transport::NodePtr mNode;
-        gazebo::transport::PublisherPtr mWindVelocityPublisher;
+        gazebo::transport::PublisherPtr mWaveVelocityPublisher;
+        gazebo::transport::PublisherPtr mWaveFrequencyPublisher;
     public:
         void setGazeboModel( std::string const& pluginName, ModelPtr model );
 
-        /** TaskContext constructor for WindSourceTask
+        /** TaskContext constructor for WaveSourceTask
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
          * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
          */
-        WindSourceTask(std::string const& name = "gazebo_usv::WindSourceTask");
+        WaveSourceTask(std::string const& name = "gazebo_usv::WaveSourceTask");
 
-        /** Default deconstructor of WindSourceTask
+        /** Default deconstructor of WaveSourceTask
          */
-        ~WindSourceTask();
+        ~WaveSourceTask();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the

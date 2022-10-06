@@ -26,6 +26,19 @@ task_context 'WindSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
     input_port 'wind_velocity', '/base/Vector3d'
 end
 
+task_context 'WaveSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
+    needs_configuration
+
+    exception_states 'NO_TOPIC_CONNECTION'
+
+    # Plugin full name
+    attribute 'name', '/std/string'
+
+    # Wave velocity input port
+    input_port 'wave_velocity', '/base/Vector3d'
+    input_port 'wave_frequency', '/base/Vector3d'
+end
+
 task_context "DirectForceApplicationTask", subclasses: "rock_gazebo::ModelPluginTask" do
     needs_configuration
 

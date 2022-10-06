@@ -22,8 +22,10 @@ DirectForceApplicationTask::~DirectForceApplicationTask()
 void DirectForceApplicationTask::setGazeboModel(std::string const& pluginName, gazebo::physics::ModelPtr model) {
     std::string worldName = model->GetWorld()->Name();
 
-    std::string taskName = "gazebo::" + worldName + "::" + model->GetName() + "::" + pluginName;
+    std::string taskName = std::regex_replace(pluginName, std::regex("__"), "::");
     provides()->setName(taskName);
+    
+    mModelName = std::regex_replace(pluginName, std::regex("__"), "/");
 }
 
 
@@ -39,8 +41,8 @@ bool DirectForceApplicationTask::configureHook()
         return false;
     }
 
-    auto topic_name = _link_name.get() + "/gazebo_usv_force";
-    mForcePub = mNode->Advertise<gazebo::msgs::Vector3d>("~/" + topic_name);
+    auto topic_name = mModelName + "/" + _link_name.get() + "/gazebo_usv_force";
+    mForcePub = mNode->Advertise<gazebo::msgs::Vector3d>("/" + topic_name);
 
     return true;
 }

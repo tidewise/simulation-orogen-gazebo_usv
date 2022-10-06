@@ -26,7 +26,7 @@ bool WindSourceTask::configureHook()
     mNode = transport::NodePtr(new transport::Node());
     mNode->Init();
 
-    mWindVelocityPublisher = mNode->Advertise<gazebo::msgs::Vector3d>("~/" + mModelName + "/wind_velocity");
+    mWindVelocityPublisher = mNode->Advertise<gazebo::msgs::Vector3d>("/" + mModelName + "/wind_velocity");
     gzmsg << "WindSourceTask: advertising to gazebo topic ~/" + mModelName + "/wind_velocity" << endl;
     return true;
 }
@@ -35,11 +35,11 @@ void WindSourceTask::setGazeboModel(std::string const &pluginName, ModelPtr mode
 {
     string worldName = model->GetWorld()->Name();
 
-    string taskName = "gazebo::" + worldName + "::" + model->GetName() + "::" + pluginName;
+    string taskName = std::regex_replace(pluginName, std::regex("__"), "::");
     provides()->setName(taskName);
     _name.set(taskName);
 
-    mModelName = model->GetName();
+    mModelName = std::regex_replace(pluginName, std::regex("__"), "/");
 }
 
 bool WindSourceTask::startHook()

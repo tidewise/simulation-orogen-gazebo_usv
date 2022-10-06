@@ -8,6 +8,7 @@
 #include <gazebo/physics/PhysicsTypes.hh>
 #include <gazebo/transport/Node.hh>
 #include <gazebo/transport/Publisher.hh>
+#include <regex>
 
 namespace gazebo_usv {
 
@@ -29,6 +30,7 @@ namespace gazebo_usv {
     {
 	friend class DirectForceApplicationTaskBase;
     protected:
+        std::string mModelName;
 
 
 
