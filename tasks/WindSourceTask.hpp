@@ -5,7 +5,6 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
-#include <regex>
 
 namespace gazebo_usv{
 
@@ -34,6 +33,7 @@ namespace gazebo_usv{
         gazebo::transport::PublisherPtr mWindVelocityPublisher;
     public:
         void setGazeboModel( std::string const& pluginName, ModelPtr model );
+        void setGazeboPluginTaskName( std::string const& pluginTaskName );
 
         /** TaskContext constructor for WindSourceTask
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.

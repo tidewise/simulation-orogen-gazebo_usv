@@ -1,4 +1,5 @@
 #include "WindSourceTask.hpp"
+#include <regex>
 
 using namespace std;
 using namespace gazebo;
@@ -27,19 +28,20 @@ bool WindSourceTask::configureHook()
     mNode->Init();
 
     mWindVelocityPublisher = mNode->Advertise<gazebo::msgs::Vector3d>("/" + mModelName + "/wind_velocity");
-    gzmsg << "WindSourceTask: advertising to gazebo topic ~/" + mModelName + "/wind_velocity" << endl;
+    gzmsg << "WindSourceTask: advertising to gazebo topic /" + mModelName + "/wind_velocity" << endl;
     return true;
 }
 
 void WindSourceTask::setGazeboModel(std::string const &pluginName, ModelPtr model)
 {
-    string worldName = model->GetWorld()->Name();
-
-    string taskName = std::regex_replace(pluginName, std::regex("__"), "::");
-    provides()->setName(taskName);
-    _name.set(taskName);
-
     mModelName = std::regex_replace(pluginName, std::regex("__"), "/");
+}
+
+
+void WindSourceTask::setGazeboPluginTaskName( std::string const& pluginTaskName )
+{
+    provides()->setName(pluginTaskName);
+    _name.set(pluginTaskName);
 }
 
 bool WindSourceTask::startHook()

@@ -8,7 +8,6 @@
 #include <gazebo/physics/PhysicsTypes.hh>
 #include <gazebo/transport/Node.hh>
 #include <gazebo/transport/Publisher.hh>
-#include <regex>
 
 namespace gazebo_usv {
 
@@ -46,6 +45,7 @@ namespace gazebo_usv {
 	    ~DirectForceApplicationTask();
 
         void setGazeboModel(std::string const& pluginName, gazebo::physics::ModelPtr model) override;
+        void setGazeboPluginTaskName( std::string const& pluginTaskName );
 
 
         /** This hook is called by Orocos when the state machine transitions

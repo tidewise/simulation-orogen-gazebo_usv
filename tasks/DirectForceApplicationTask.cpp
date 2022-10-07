@@ -3,6 +3,7 @@
 #include "DirectForceApplicationTask.hpp"
 
 #include <string>
+#include <regex>
 
 #include <gazebo/physics/Model.hh>
 
@@ -19,16 +20,15 @@ DirectForceApplicationTask::~DirectForceApplicationTask()
 {
 }
 
-void DirectForceApplicationTask::setGazeboModel(std::string const& pluginName, gazebo::physics::ModelPtr model) {
-    std::string worldName = model->GetWorld()->Name();
-
-    std::string taskName = std::regex_replace(pluginName, std::regex("__"), "::");
-    provides()->setName(taskName);
-    
+void DirectForceApplicationTask::setGazeboModel(std::string const& pluginName, gazebo::physics::ModelPtr model) 
+{
     mModelName = std::regex_replace(pluginName, std::regex("__"), "/");
 }
 
-
+void DirectForceApplicationTask::setGazeboPluginTaskName( std::string const& pluginTaskName )
+{
+    provides()->setName(pluginTaskName);
+}
 
 
 /// The following lines are template definitions for the various state machine
