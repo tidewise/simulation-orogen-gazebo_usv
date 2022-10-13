@@ -28,10 +28,10 @@ namespace gazebo_usv{
         typedef gazebo::physics::ModelPtr ModelPtr;
 
     protected:
-        std::string mModelName;
-        gazebo::transport::NodePtr mNode;
-        gazebo::transport::PublisherPtr mWaveAmplitudePublisher;
-        gazebo::transport::PublisherPtr mWaveFrequencyPublisher;
+        std::string m_model_name;
+        gazebo::transport::NodePtr m_node;
+        gazebo::transport::PublisherPtr m_wave_amplitude_publisher;
+        gazebo::transport::PublisherPtr m_wave_frequency_publisher;
     public:
         void setGazeboModel( std::string const& pluginName, ModelPtr model );
         void setGazeboPluginTaskName( std::string const& pluginTaskName );

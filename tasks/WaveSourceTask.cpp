@@ -24,23 +24,21 @@ bool WaveSourceTask::configureHook()
         return false;
 
     // Set gazebo topic to advertise
-    mNode = transport::NodePtr(new transport::Node());
-    mNode->Init();
+    m_node = transport::NodePtr(new transport::Node());
+    m_node->Init();
 
-    mWaveAmplitudePublisher = mNode->Advertise<gazebo::msgs::Vector3d>("/" + mModelName + "/wave_amplitude");
-    gzmsg << "WaveSourceTask: advertising to gazebo topic /" + mModelName + "/wave_amplitude" << endl;
+    m_wave_amplitude_publisher = m_node->Advertise<gazebo::msgs::Vector3d>("/" + m_model_name + "/wave_amplitude");
+    gzmsg << "WaveSourceTask: advertising to gazebo topic /" + m_model_name + "/wave_amplitude" << endl;
 
-    mWaveFrequencyPublisher = mNode->Advertise<gazebo::msgs::Vector3d>("/" + mModelName + "/wave_frequency");
-    gzmsg << "WaveSourceTask: advertising to gazebo topic /" + mModelName + "/wave_frequency" << endl;
+    m_wave_frequency_publisher = m_node->Advertise<gazebo::msgs::Vector3d>("/" + m_model_name + "/wave_frequency");
+    gzmsg << "WaveSourceTask: advertising to gazebo topic /" + m_model_name + "/wave_frequency" << endl;
         
-    cout << "Task";
-    cout << mModelName;
     return true;
 }
 
 void WaveSourceTask::setGazeboModel(std::string const &pluginName, ModelPtr model)
 {
-    mModelName = std::regex_replace(pluginName, std::regex("__"), "/");
+    m_model_name = std::regex_replace(pluginName, std::regex("__"), "/");
 }
 
 void WaveSourceTask::setGazeboPluginTaskName( std::string const& pluginTaskName )
@@ -70,13 +68,13 @@ void WaveSourceTask::updateHook()
     wave_amp_msg.set_x(wave_amplitude.x());
     wave_amp_msg.set_y(wave_amplitude.y());
     wave_amp_msg.set_z(wave_amplitude.z());
-    mWaveAmplitudePublisher->Publish(wave_amp_msg);
+    m_wave_amplitude_publisher->Publish(wave_amp_msg);
 
     gazebo::msgs::Vector3d wave_freq_msg;
     wave_freq_msg.set_x(wave_frequency.x());
     wave_freq_msg.set_y(wave_frequency.y());
     wave_freq_msg.set_z(wave_frequency.z());
-    mWaveFrequencyPublisher->Publish(wave_freq_msg);
+    m_wave_frequency_publisher->Publish(wave_freq_msg);
     WaveSourceTaskBase::updateHook();
 }
 void WaveSourceTask::errorHook()
@@ -89,13 +87,13 @@ void WaveSourceTask::stopHook()
     wave_amp_msg.set_x(0);
     wave_amp_msg.set_y(0);
     wave_amp_msg.set_z(0);
-    mWaveAmplitudePublisher->Publish(wave_amp_msg);
+    m_wave_amplitude_publisher->Publish(wave_amp_msg);
 
     gazebo::msgs::Vector3d wave_freq_msg;
     wave_freq_msg.set_x(0);
     wave_freq_msg.set_y(0);
     wave_freq_msg.set_z(0);
-    mWaveFrequencyPublisher->Publish(wave_freq_msg);
+    m_wave_frequency_publisher->Publish(wave_freq_msg);
 
     WaveSourceTaskBase::stopHook();
 }
