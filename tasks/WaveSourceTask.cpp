@@ -38,15 +38,8 @@ bool WaveSourceTask::configureHook()
 
 void WaveSourceTask::setGazeboModel(std::string const &pluginName, ModelPtr model)
 {
-    m_model_name = std::regex_replace(pluginName, std::regex("__"), "/");
+    m_model_name = getTopicNameFromPluginName(pluginName);
 }
-
-void WaveSourceTask::setGazeboPluginTaskName( std::string const& pluginTaskName )
-{
-    provides()->setName(pluginTaskName);
-    _name.set(pluginTaskName);
-}
-
 
 bool WaveSourceTask::startHook()
 {

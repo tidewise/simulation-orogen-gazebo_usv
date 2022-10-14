@@ -34,7 +34,6 @@ namespace gazebo_usv{
         gazebo::transport::PublisherPtr m_wave_frequency_publisher;
     public:
         void setGazeboModel( std::string const& pluginName, ModelPtr model );
-        void setGazeboPluginTaskName( std::string const& pluginTaskName );
 
         /** TaskContext constructor for WaveSourceTask
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.

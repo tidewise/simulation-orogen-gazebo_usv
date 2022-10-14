@@ -34,14 +34,7 @@ bool WindSourceTask::configureHook()
 
 void WindSourceTask::setGazeboModel(std::string const &pluginName, ModelPtr model)
 {
-    mModelName = std::regex_replace(pluginName, std::regex("__"), "/");
-}
-
-
-void WindSourceTask::setGazeboPluginTaskName( std::string const& pluginTaskName )
-{
-    provides()->setName(pluginTaskName);
-    _name.set(pluginTaskName);
+    mModelName = getTopicNameFromPluginName(pluginName);
 }
 
 bool WindSourceTask::startHook()

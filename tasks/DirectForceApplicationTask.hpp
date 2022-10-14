@@ -45,8 +45,6 @@ namespace gazebo_usv {
 	    ~DirectForceApplicationTask();
 
         void setGazeboModel(std::string const& pluginName, gazebo::physics::ModelPtr model) override;
-        void setGazeboPluginTaskName( std::string const& pluginTaskName );
-
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the

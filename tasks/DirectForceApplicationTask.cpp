@@ -22,12 +22,7 @@ DirectForceApplicationTask::~DirectForceApplicationTask()
 
 void DirectForceApplicationTask::setGazeboModel(std::string const& pluginName, gazebo::physics::ModelPtr model) 
 {
-    mModelName = std::regex_replace(pluginName, std::regex("__"), "/");
-}
-
-void DirectForceApplicationTask::setGazeboPluginTaskName( std::string const& pluginTaskName )
-{
-    provides()->setName(pluginTaskName);
+    mModelName = getTopicNameFromPluginName(pluginName);
 }
 
 
