@@ -34,7 +34,7 @@ bool WindSourceTask::configureHook()
 
 void WindSourceTask::setGazeboModel(std::string const &pluginName, ModelPtr model)
 {
-    mModelName = getTopicNameFromPluginName(pluginName);
+    mModelName = getNamespaceFromPluginName(pluginName);
 }
 
 bool WindSourceTask::startHook()

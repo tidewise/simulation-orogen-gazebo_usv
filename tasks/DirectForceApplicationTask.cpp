@@ -22,7 +22,7 @@ DirectForceApplicationTask::~DirectForceApplicationTask()
 
 void DirectForceApplicationTask::setGazeboModel(std::string const& pluginName, gazebo::physics::ModelPtr model) 
 {
-    mModelName = getTopicNameFromPluginName(pluginName);
+    mModelName = getNamespaceFromPluginName(pluginName);
 }
 
 

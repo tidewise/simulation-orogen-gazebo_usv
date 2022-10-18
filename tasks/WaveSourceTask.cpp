@@ -38,7 +38,7 @@ bool WaveSourceTask::configureHook()
 
 void WaveSourceTask::setGazeboModel(std::string const &pluginName, ModelPtr model)
 {
-    m_model_name = getTopicNameFromPluginName(pluginName);
+    m_model_name = getNamespaceFromPluginName(pluginName);
 }
 
 bool WaveSourceTask::startHook()
