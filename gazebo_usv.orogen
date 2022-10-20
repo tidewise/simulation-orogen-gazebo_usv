@@ -28,9 +28,8 @@ task_context 'WaveSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
 
     exception_states 'NO_TOPIC_CONNECTION'
 
-    # Wave amplitude input port
-    input_port 'wave_amplitude', '/base/Vector3d'
-    input_port 'wave_frequency', '/base/Vector3d'
+    # Wave attributes input port
+    input_port 'wave_attributes', '/gazebo_usv/WaveAttributes'
 end
 
 task_context "DirectForceApplicationTask", subclasses: "rock_gazebo::ModelPluginTask" do

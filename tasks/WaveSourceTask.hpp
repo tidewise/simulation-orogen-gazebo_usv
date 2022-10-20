@@ -2,16 +2,19 @@
 #define GAZEBO_USV_WaveSourceTask_TASK_HPP
 
 #include "gazebo_usv/WaveSourceTaskBase.hpp"
+#include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
-#include <gazebo/msgs/msgs.hh>
 
-namespace gazebo_usv{
+namespace gazebo_usv {
 
     /*! \class WaveSourceTask
-     * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
-     * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
-     * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
+     * \brief The task context provides and requires services. It uses an ExecutionEngine
+     to perform its functions.
+     * Essential interfaces are operations, data flow ports and properties. These
+     interfaces have been defined using the oroGen specification.
+     * In order to modify the interfaces you should (re)use oroGen and rely on the
+     associated workflow.
      *
      * \details
      * The name of a TaskContext is primarily defined via:
@@ -20,10 +23,10 @@ namespace gazebo_usv{
          task('custom_task_name','gazebo_usv::WaveSourceTask')
      end
      \endverbatim
-     *  It can be dynamically adapted when the deployment is called with a prefix argument.
+     *  It can be dynamically adapted when the deployment is called with a prefix
+     argument.
      */
-    class WaveSourceTask : public WaveSourceTaskBase
-    {
+    class WaveSourceTask : public WaveSourceTaskBase {
         friend class WaveSourceTaskBase;
         typedef gazebo::physics::ModelPtr ModelPtr;
 
@@ -32,12 +35,15 @@ namespace gazebo_usv{
         gazebo::transport::NodePtr m_node;
         gazebo::transport::PublisherPtr m_wave_amplitude_publisher;
         gazebo::transport::PublisherPtr m_wave_frequency_publisher;
+        gazebo::transport::PublisherPtr m_roll_publisher;
+
     public:
-        void setGazeboModel( std::string const& pluginName, ModelPtr model );
+        void setGazeboModel(std::string const& pluginName, ModelPtr model);
 
         /** TaskContext constructor for WaveSourceTask
-         * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
-         * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
+         * \param name Name of the task. This name needs to be unique to make it
+         * identifiable via nameservices. \param initial_state The initial TaskState of
+         * the TaskContext. Default is Stopped state.
          */
         WaveSourceTask(std::string const& name = "gazebo_usv::WaveSourceTask");
 
