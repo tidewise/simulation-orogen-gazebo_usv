@@ -29,6 +29,7 @@ namespace gazebo_usv {
     {
 	friend class DirectForceApplicationTaskBase;
     protected:
+        std::string m_model_name;
 
 
 
@@ -43,8 +44,7 @@ namespace gazebo_usv {
          */
 	    ~DirectForceApplicationTask();
 
-        void setGazeboModel(std::string const& pluginName, gazebo::physics::ModelPtr model) override;
-
+        void setGazeboModel(std::string const& plugin_name, gazebo::physics::ModelPtr model) override;
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
@@ -68,8 +68,8 @@ namespace gazebo_usv {
         void cleanupHook();
 
     private:
-        gazebo::transport::NodePtr mNode;
-        gazebo::transport::PublisherPtr mForcePub;
+        gazebo::transport::NodePtr m_node;
+        gazebo::transport::PublisherPtr m_force_pub;
     };
 }
 

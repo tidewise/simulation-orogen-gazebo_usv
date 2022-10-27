@@ -11,22 +11,18 @@ using namespace gazebo_usv;
 DirectForceApplicationTask::DirectForceApplicationTask(std::string const& name)
     : DirectForceApplicationTaskBase(name)
 {
-    this->mNode = boost::make_shared<gazebo::transport::Node>();
-    this->mNode->Init();
+    this->m_node = boost::make_shared<gazebo::transport::Node>();
+    this->m_node->Init();
 }
 
 DirectForceApplicationTask::~DirectForceApplicationTask()
 {
 }
 
-void DirectForceApplicationTask::setGazeboModel(std::string const& pluginName, gazebo::physics::ModelPtr model) {
-    std::string worldName = model->GetWorld()->Name();
-
-    std::string taskName = "gazebo::" + worldName + "::" + model->GetName() + "::" + pluginName;
-    provides()->setName(taskName);
+void DirectForceApplicationTask::setGazeboModel(std::string const& plugin_name, gazebo::physics::ModelPtr model) 
+{
+    m_model_name = getNamespaceFromPluginName(plugin_name);
 }
-
-
 
 
 /// The following lines are template definitions for the various state machine
@@ -39,8 +35,8 @@ bool DirectForceApplicationTask::configureHook()
         return false;
     }
 
-    auto topic_name = _link_name.get() + "/gazebo_usv_force";
-    mForcePub = mNode->Advertise<gazebo::msgs::Vector3d>("~/" + topic_name);
+    auto topic_name = m_model_name + "/" + _link_name.get() + "/gazebo_usv_force";
+    m_force_pub = m_node->Advertise<gazebo::msgs::Vector3d>("/" + topic_name);
 
     return true;
 }
@@ -66,7 +62,7 @@ void DirectForceApplicationTask::updateHook()
     msg.set_y(force_cmd.y());
     msg.set_z(force_cmd.z());
 
-    mForcePub->Publish(msg);
+    m_force_pub->Publish(msg);
 }
 void DirectForceApplicationTask::errorHook()
 {
@@ -80,5 +76,5 @@ void DirectForceApplicationTask::cleanupHook()
 {
     DirectForceApplicationTaskBase::cleanupHook();
 
-    mForcePub->Fini();
+    m_force_pub->Fini();
 }
