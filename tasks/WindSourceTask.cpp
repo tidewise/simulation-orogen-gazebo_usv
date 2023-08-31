@@ -48,6 +48,11 @@ void WindSourceTask::updateHook()
     base::Vector3d wind_velocity;
     if (_wind_velocity.read(wind_velocity) != RTT::NewData)
         return;
+
+    base::samples::RigidBodyState wind_pose;
+    wind_pose.velocity = wind_velocity;
+    _wind_pose.write(wind_pose);
+
     gazebo::msgs::Vector3d wind_vel_msg;
     wind_vel_msg.set_x(wind_velocity.x());
     wind_vel_msg.set_y(wind_velocity.y());
