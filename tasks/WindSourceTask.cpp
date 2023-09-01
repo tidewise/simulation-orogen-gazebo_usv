@@ -66,6 +66,10 @@ void WindSourceTask::errorHook()
 }
 void WindSourceTask::stopHook()
 {
+    base::samples::RigidBodyState wind_pose;
+    wind_pose.velocity = Eigen::Vector3d::Zero();
+    _wind_pose.write(wind_pose);
+
     gazebo::msgs::Vector3d wind_vel_msg;
     wind_vel_msg.set_x(0);
     wind_vel_msg.set_y(0);
