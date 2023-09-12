@@ -21,6 +21,9 @@ task_context 'WindSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
 
     # Wind velocity input port
     input_port 'wind_velocity', '/base/Vector3d'
+
+    # Wind pose output port
+    output_port 'wind_pose', '/base/samples/RigidBodyState'
 end
 
 task_context 'WaveSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
@@ -49,18 +52,18 @@ task_context 'TetherSimulationTask' do
     property 'max_tether_length', '/double'
 
     property 'tether_config', '/uuv_tether_control/TetherDragAndInertiaConfig'
-    
+
     # The rov's link where the tether is attached
     input_port 'rov_attachment', '/base/samples/RigidBodyState'
 
     # The usv's link where the tether is attached   
     input_port 'usv_attachment', '/base/samples/RigidBodyState'
-   
+
     # Water speed over ground, expressed in the rov 
     input_port 'water_speed', '/base/Vector3d'
 
     output_port 'rov_force', 'base/Vector3d'
-   
+
     output_port 'usv_force', '/base/Vector3d'
 
     port_driven
