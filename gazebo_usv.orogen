@@ -6,6 +6,7 @@ import_types_from "gazebo_usvTypes.hpp"
 
 import_types_from "std"
 import_types_from "base"
+import_types_from "control_base"
 
 using_library "gazebo"
 using_library "base-logging"
@@ -67,4 +68,26 @@ task_context 'TetherSimulationTask' do
     output_port 'usv_force', '/base/Vector3d'
 
     port_driven
+end
+
+task_context "ThrusterLimitationTask" do
+    needs_configuration
+
+    # Control limits
+    #
+    # You may only set the speed and effort fields. Setting any other field
+    # will fail on configure
+    #
+    # If set, min and max speeds need to be the opposite of each other. The
+    # controller does not support limiting them separately
+    property "limits", "/base/JointLimits"
+
+    # The input thruster command
+    input_port "cmd_in", "/base/commands/Joints"
+    # The output thruster command
+    output_port "cmd_out", "/base/commands/Joints"
+    # The thruster saturation signal
+    output_port "saturation_signal", "/control_base/SaturationSignal"
+
+    periodic 0.1
 end
