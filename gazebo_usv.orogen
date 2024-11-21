@@ -70,6 +70,8 @@ task_context 'TetherSimulationTask' do
     port_driven
 end
 
+# Task to limit the propulsion command and output the saturation signal when
+# the inputed command is out of the range
 task_context "ThrusterLimitationTask" do
     needs_configuration
 
@@ -88,6 +90,8 @@ task_context "ThrusterLimitationTask" do
     output_port "cmd_out", "/base/commands/Joints"
     # The thruster saturation signal
     output_port "saturation_signal", "/control_base/SaturationSignal"
+
+    exception_states "INVALID_COMMAND_SIZE", "INVALID_COMMAND_PARAMETER"
 
     periodic 0.1
 end

@@ -53,12 +53,27 @@ bool ThrusterLimitationTask::checkSpeedSaturation(commands::Joints const& cmd)
            cmd.elements[0].speed <= m_limits.elements[0].min.speed;
 }
 
+void ThrusterLimitationTask::evaluateSpeedCommand(commands::Joints const& cmd)
+{
+    if (cmd.elements.size() != 1) {
+        return exception(INVALID_COMMAND_SIZE);
+    }
+
+    auto joint = cmd.elements.at(0);
+    if (!joint.isSpeed()) {
+        return exception(INVALID_COMMAND_PARAMETER);
+    }
+}
+
 void ThrusterLimitationTask::updateHook()
 {
+    ThrusterLimitationTaskBase::updateHook();
+
     commands::Joints cmd_in;
     if (_cmd_in.read(cmd_in) != RTT::NewData) {
         return;
     }
+    evaluateSpeedCommand(cmd_in);
 
     SaturationSignal saturation_signal;
     saturation_signal.value = checkSpeedSaturation(cmd_in);
@@ -66,13 +81,13 @@ void ThrusterLimitationTask::updateHook()
     _saturation_signal.write(saturation_signal);
 
     commands::Joints cmd_out;
+    cmd_out.elements.resize(1);
     cmd_out.elements[0].speed = clamp(cmd_in.elements[0].speed,
         m_limits.elements[0].min.speed,
         m_limits.elements[0].max.speed);
+
     cmd_out.time = Time::now();
     _cmd_out.write(cmd_out);
-
-    ThrusterLimitationTaskBase::updateHook();
 }
 
 void ThrusterLimitationTask::errorHook()

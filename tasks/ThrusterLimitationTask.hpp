@@ -30,6 +30,7 @@ namespace gazebo_usv {
     private:
         base::JointLimits m_limits;
         bool checkSpeedSaturation(base::commands::Joints const& cmd);
+        void evaluateSpeedCommand(base::commands::Joints const& cmd);
 
     public:
         /** TaskContext constructor for ThrusterLimitationTask
