@@ -76,12 +76,8 @@ task_context "ThrusterLimitationTask" do
     needs_configuration
 
     # Control limits
-    #
-    # You may only set the speed and effort fields. Setting any other field
-    # will fail on configure
-    #
-    # If set, min and max speeds need to be the opposite of each other. The
-    # controller does not support limiting them separately
+    # To replicate the same behaviour of the live system, set the min and max speeds to be
+    # the opposite of each other.
     property "limits", "/base/JointLimits"
 
     # The input thruster command
