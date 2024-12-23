@@ -28,10 +28,10 @@ bool ThrusterLimitationTask::configureHook()
     }
     m_limits = _limits.get();
     if (m_limits.elements.empty()) {
-        // Initialize speed limits as infinity
+        // Initialize effort limits as infinity
         JointLimits infinity;
         JointLimitRange range;
-        range.Speed(-base::infinity<float>(), base::infinity<float>());
+        range.Effort(-base::infinity<float>(), base::infinity<float>());
         infinity.elements.push_back(range);
         m_limits = infinity;
     }
@@ -47,22 +47,40 @@ bool ThrusterLimitationTask::startHook()
     return true;
 }
 
-bool ThrusterLimitationTask::checkSpeedSaturation(commands::Joints const& cmd)
+bool ThrusterLimitationTask::checkEffortSaturation(commands::Joints const& cmd)
 {
-    return cmd.elements[0].speed >= m_limits.elements[0].max.speed ||
-           cmd.elements[0].speed <= m_limits.elements[0].min.speed;
+    return cmd.elements[0].effort >= m_limits.elements[0].max.effort ||
+           cmd.elements[0].effort <= m_limits.elements[0].min.effort ||
+           cmd.elements[1].effort >= m_limits.elements[0].max.effort ||
+           cmd.elements[1].effort <= m_limits.elements[0].min.effort;
 }
 
-void ThrusterLimitationTask::validateSpeedCommand(commands::Joints const& cmd)
+void ThrusterLimitationTask::validateEffortCommand(commands::Joints const& cmd)
 {
-    if (cmd.elements.size() != 1) {
+    if (cmd.elements.size() != 2) {
         return exception(INVALID_COMMAND_SIZE);
     }
-
-    auto joint = cmd.elements.at(0);
-    if (!joint.isSpeed()) {
+    std::vector<base::JointState> joints;
+    joints.resize(2);
+    joints = cmd.elements;
+    if (!joints[0].isEffort() || !joints[1].isEffort()) {
         return exception(INVALID_COMMAND_PARAMETER);
     }
+}
+
+commands::Joints ThrusterLimitationTask::saturateCommand(commands::Joints const& cmd)
+{
+    commands::Joints cmd_out;
+    cmd_out.names.resize(2);
+    cmd_out.elements.resize(2);
+    for (size_t i = 0; i < 2; i++) {
+        cmd_out.names[i] = cmd.names[i];
+        cmd_out.elements[i] = cmd.elements[i];
+        cmd_out.elements[i].effort = clamp(cmd.elements[i].effort,
+            m_limits.elements[i].min.effort,
+            m_limits.elements[i].max.effort);
+    }
+    return cmd_out;
 }
 
 void ThrusterLimitationTask::updateHook()
@@ -73,19 +91,14 @@ void ThrusterLimitationTask::updateHook()
     if (_cmd_in.read(cmd_in) != RTT::NewData) {
         return;
     }
-    validateSpeedCommand(cmd_in);
+    validateEffortCommand(cmd_in);
 
     SaturationSignal saturation_signal;
-    saturation_signal.value = checkSpeedSaturation(cmd_in);
+    saturation_signal.value = checkEffortSaturation(cmd_in);
     saturation_signal.time = cmd_in.time;
     _saturation_signal.write(saturation_signal);
 
-    commands::Joints cmd_out;
-    cmd_out.elements.resize(1);
-    cmd_out.elements[0].speed = clamp(cmd_in.elements[0].speed,
-        m_limits.elements[0].min.speed,
-        m_limits.elements[0].max.speed);
-
+    commands::Joints cmd_out = saturateCommand(cmd_in);
     cmd_out.time = Time::now();
     _cmd_out.write(cmd_out);
 }
