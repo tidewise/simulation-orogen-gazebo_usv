@@ -19,20 +19,32 @@ describe OroGen.gazebo_usv.ThrusterLimitationTask do
 
         @task.properties.limits = Types.base.JointLimits.new(
             elements: [{
-                min: Types.base.JointState.Speed(-1000),
-                max: Types.base.JointState.Speed(1000)
+                min: Types.base.JointState.Effort(-1000),
+                max: Types.base.JointState.Effort(1000)
             }]
         )
-
-        @max_cmd = Types.base.samples.Joints.new(elements: [{ speed: 1000 }])
-        @min_cmd = Types.base.samples.Joints.new(elements: [{ speed: -1000 }])
-
-        @cmd = Types.base.samples.Joints.new(elements: [{ speed: 500 }])
-        @cmd_above_the_max_limit = Types.base.samples.Joints.new(
-            elements: [{ speed: 1100 }]
+        @max_cmd = Types.base.samples.Joints.new(
+            elements: [{ effort: 1000 }, { effort: 1000 }],
+            names: %w[port stbd]
         )
+        @min_cmd = Types.base.samples.Joints.new(
+            elements: [{ effort: -1000 }, { effort: -1000 }],
+            names: %w[port stbd]
+        )
+
+        @cmd = Types.base.samples.Joints.new(
+            elements: [{ effort: 500 }, { effort: 500 }],
+            names: %w[port stbd]
+        )
+
+        @cmd_above_the_max_limit = Types.base.samples.Joints.new(
+            elements: [{ effort: 1100 }, { effort: 1100 }],
+            names: %w[port stbd]
+        )
+
         @cmd_below_the_min_limit = Types.base.samples.Joints.new(
-            elements: [{ speed: -1100 }]
+            elements: [{ effort: -1100 }, { effort: -1100 }],
+            names: %w[port stbd]
         )
 
         @saturated_signal = Types.control_base.SaturationSignal.new(value: true)
@@ -61,7 +73,7 @@ describe OroGen.gazebo_usv.ThrusterLimitationTask do
             have_one_new_sample(task.cmd_out_port)
         end
 
-        assert_equal(@cmd.elements[0].speed, output.elements[0].speed)
+        assert_equal(@cmd.elements[0].effort, output.elements[0].effort)
     end
 
     it "limits the input command when it is bigger than the max limit range" do
@@ -72,7 +84,7 @@ describe OroGen.gazebo_usv.ThrusterLimitationTask do
             have_one_new_sample(task.cmd_out_port)
         end
 
-        assert_equal(@max_cmd.elements[0].speed, output.elements[0].speed)
+        assert_equal(@max_cmd.elements[0].effort, output.elements[0].effort)
     end
 
     it "limits the input command when it is smaller than the min limit range" do
@@ -83,7 +95,7 @@ describe OroGen.gazebo_usv.ThrusterLimitationTask do
             have_one_new_sample(task.cmd_out_port)
         end
 
-        assert_equal(@min_cmd.elements[0].speed, output.elements[0].speed)
+        assert_equal(@min_cmd.elements[0].effort, output.elements[0].effort)
     end
 
     it "returns a saturated signal when the input command is out of the limited range" do

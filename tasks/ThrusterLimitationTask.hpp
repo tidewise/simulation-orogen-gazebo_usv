@@ -31,7 +31,7 @@ namespace gazebo_usv {
         base::JointLimits m_limits;
         bool checkEffortSaturation(base::commands::Joints const& cmd);
         void validateEffortCommand(base::commands::Joints const& cmd);
-        base::commands::Joints saturateCommand(base::commands::Joints const& cmd);
+        base::commands::Joints saturateEffortCommand(base::commands::Joints const& cmd);
 
     public:
         /** TaskContext constructor for ThrusterLimitationTask

@@ -68,7 +68,7 @@ void ThrusterLimitationTask::validateEffortCommand(commands::Joints const& cmd)
     }
 }
 
-commands::Joints ThrusterLimitationTask::saturateCommand(commands::Joints const& cmd)
+commands::Joints ThrusterLimitationTask::saturateEffortCommand(commands::Joints const& cmd)
 {
     commands::Joints cmd_out;
     cmd_out.names.resize(2);
@@ -98,7 +98,7 @@ void ThrusterLimitationTask::updateHook()
     saturation_signal.time = cmd_in.time;
     _saturation_signal.write(saturation_signal);
 
-    commands::Joints cmd_out = saturateCommand(cmd_in);
+    commands::Joints cmd_out = saturateEffortCommand(cmd_in);
     cmd_out.time = Time::now();
     _cmd_out.write(cmd_out);
 }
