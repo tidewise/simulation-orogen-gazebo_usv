@@ -21,31 +21,17 @@ describe OroGen.gazebo_usv.ThrusterLimitationTask do
             elements: [{
                 min: Types.base.JointState.Effort(-1000),
                 max: Types.base.JointState.Effort(1000)
-            }]
-        )
-        @max_cmd = Types.base.samples.Joints.new(
-            elements: [{ effort: 1000 }, { effort: 1000 }],
+            }, {
+                min: Types.base.JointState.Effort(-1000),
+                max: Types.base.JointState.Effort(1000)
+            }],
             names: %w[port stbd]
         )
-        @min_cmd = Types.base.samples.Joints.new(
-            elements: [{ effort: -1000 }, { effort: -1000 }],
-            names: %w[port stbd]
-        )
-
-        @cmd = Types.base.samples.Joints.new(
-            elements: [{ effort: 500 }, { effort: 500 }],
-            names: %w[port stbd]
-        )
-
-        @cmd_above_the_max_limit = Types.base.samples.Joints.new(
-            elements: [{ effort: 1100 }, { effort: 1100 }],
-            names: %w[port stbd]
-        )
-
-        @cmd_below_the_min_limit = Types.base.samples.Joints.new(
-            elements: [{ effort: -1100 }, { effort: -1100 }],
-            names: %w[port stbd]
-        )
+        @max_cmd = effort_joint(1000, 1000)
+        @min_cmd = effort_joint(-1000, -1000)
+        @cmd = effort_joint(500, 500)
+        @cmd_above_the_max_limit = effort_joint(1100, 1100)
+        @cmd_below_the_min_limit = effort_joint(-1100, -1100)
 
         @saturated_signal = Types.control_base.SaturationSignal.new(value: true)
         @not_saturated_signal = Types.control_base.SaturationSignal.new(value: false)
@@ -107,12 +93,12 @@ describe OroGen.gazebo_usv.ThrusterLimitationTask do
         end
         assert_equal(@saturated_signal, output)
 
-        output_2 = expect_execution do
+        output2 = expect_execution do
             syskit_write @task.cmd_in_port, @cmd_below_the_min_limit
         end.to do
             have_one_new_sample(task.saturation_signal_port)
         end
-        assert_equal(@saturated_signal, output_2)
+        assert_equal(@saturated_signal, output2)
     end
 
     it "returns a no saturated signal when the input command within the limited range" do
@@ -124,5 +110,12 @@ describe OroGen.gazebo_usv.ThrusterLimitationTask do
         end
 
         assert_equal(@not_saturated_signal, output)
+    end
+
+    def effort_joint(port, stbd)
+        Types.base.samples.Joints.new(
+            elements: [{ effort: port }, { effort: stbd }],
+            names: %w[port stbd]
+        )
     end
 end
