@@ -27,17 +27,8 @@ bool ThrusterLimitationTask::configureHook()
         return false;
     }
     m_limits = _limits.get();
-    if (m_limits.elements.empty()) {
-        // Initialize effort limits as infinity
-        JointLimits infinity;
-        JointLimitRange range;
-        range.Effort(-base::infinity<float>(), base::infinity<float>());
-        infinity.elements.push_back(range);
-        infinity.elements.push_back(range);
-        infinity.names.push_back("thruster::left");
-        infinity.names.push_back("thruster::right");
-        m_limits = infinity;
-    }
+    return true;
+}
 
 bool validateCommandType(JointState const& state, JointLimitRange const& limit)
 {
