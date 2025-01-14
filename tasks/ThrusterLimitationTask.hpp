@@ -29,7 +29,7 @@ namespace gazebo_usv {
 
     private:
         base::JointLimits m_limits;
-        void validateEffortCommand(base::commands::Joints const& cmd);
+        void validateCommand(base::commands::Joints const& cmd);
 
     public:
         /** TaskContext constructor for ThrusterLimitationTask

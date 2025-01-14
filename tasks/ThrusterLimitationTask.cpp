@@ -39,6 +39,28 @@ bool ThrusterLimitationTask::configureHook()
         m_limits = infinity;
     }
 
+bool validateCommandType(JointState const& state, JointLimitRange const& limit)
+{
+    if(state.hasPosition() && (!limit.min.hasPosition() || !limit.max.hasPosition()))
+    {
+        return false;
+    }
+    if(state.hasSpeed() && (!limit.min.hasSpeed() || !limit.max.hasSpeed()))
+    {
+        return false;
+    }
+    if(state.hasRaw() && (!limit.min.hasRaw() || !limit.max.hasRaw()))
+    {
+        return false;
+    }
+    if(state.hasEffort() && (!limit.min.hasEffort() || !limit.max.hasEffort()))
+    {
+        return false;
+    }
+    if(state.hasAcceleration() && (!limit.min.hasAcceleration() || !limit.max.hasAcceleration()))
+    {
+        return false;
+    }
     return true;
 }
 
@@ -50,16 +72,17 @@ bool ThrusterLimitationTask::startHook()
     return true;
 }
 
-void ThrusterLimitationTask::validateEffortCommand(commands::Joints const& cmd)
+void ThrusterLimitationTask::validateCommand(commands::Joints const& cmd)
 {
-    if (cmd.elements.size() != 2) {
+    if (cmd.elements.size() != m_limits.elements.size()) {
         return exception(INVALID_COMMAND_SIZE);
     }
-    std::vector<base::JointState> joints;
-    joints.resize(2);
-    joints = cmd.elements;
-    if (!joints[0].isEffort() || !joints[1].isEffort()) {
-        return exception(INVALID_COMMAND_PARAMETER);
+
+    for (size_t i = 0; i < cmd.elements.size(); i++)
+    {
+        if(!validateCommandType(cmd.elements[i], m_limits.elements[i])){
+            return exception(INVALID_COMMAND_PARAMETER);
+        }
     }
 }
 
@@ -71,7 +94,7 @@ void ThrusterLimitationTask::updateHook()
     if (_cmd_in.read(cmd_in) != RTT::NewData) {
         return;
     }
-    validateEffortCommand(cmd_in);
+    validateCommand(cmd_in);
 
     SaturationSignal saturation_signal;
     auto [saturated, cmd_out] = m_limits.saturate(cmd_in);
