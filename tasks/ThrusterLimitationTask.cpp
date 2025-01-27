@@ -27,15 +27,31 @@ bool ThrusterLimitationTask::configureHook()
         return false;
     }
     m_limits = _limits.get();
-    if (m_limits.elements.empty()) {
-        // Initialize speed limits as infinity
-        JointLimits infinity;
-        JointLimitRange range;
-        range.Speed(-base::infinity<float>(), base::infinity<float>());
-        infinity.elements.push_back(range);
-        m_limits = infinity;
-    }
+    return true;
+}
 
+bool validateCommandType(JointState const& state, JointLimitRange const& limit)
+{
+    if(state.hasPosition() && (!limit.min.hasPosition() || !limit.max.hasPosition()))
+    {
+        return false;
+    }
+    if(state.hasSpeed() && (!limit.min.hasSpeed() || !limit.max.hasSpeed()))
+    {
+        return false;
+    }
+    if(state.hasRaw() && (!limit.min.hasRaw() || !limit.max.hasRaw()))
+    {
+        return false;
+    }
+    if(state.hasEffort() && (!limit.min.hasEffort() || !limit.max.hasEffort()))
+    {
+        return false;
+    }
+    if(state.hasAcceleration() && (!limit.min.hasAcceleration() || !limit.max.hasAcceleration()))
+    {
+        return false;
+    }
     return true;
 }
 
@@ -47,21 +63,17 @@ bool ThrusterLimitationTask::startHook()
     return true;
 }
 
-bool ThrusterLimitationTask::checkSpeedSaturation(commands::Joints const& cmd)
+void ThrusterLimitationTask::validateCommand(commands::Joints const& cmd)
 {
-    return cmd.elements[0].speed >= m_limits.elements[0].max.speed ||
-           cmd.elements[0].speed <= m_limits.elements[0].min.speed;
-}
-
-void ThrusterLimitationTask::validateSpeedCommand(commands::Joints const& cmd)
-{
-    if (cmd.elements.size() != 1) {
+    if (cmd.elements.size() != m_limits.elements.size()) {
         return exception(INVALID_COMMAND_SIZE);
     }
 
-    auto joint = cmd.elements.at(0);
-    if (!joint.isSpeed()) {
-        return exception(INVALID_COMMAND_PARAMETER);
+    for (size_t i = 0; i < cmd.elements.size(); i++)
+    {
+        if(!validateCommandType(cmd.elements[i], m_limits.elements[i])){
+            return exception(INVALID_COMMAND_PARAMETER);
+        }
     }
 }
 
@@ -73,19 +85,13 @@ void ThrusterLimitationTask::updateHook()
     if (_cmd_in.read(cmd_in) != RTT::NewData) {
         return;
     }
-    validateSpeedCommand(cmd_in);
+    validateCommand(cmd_in);
 
     SaturationSignal saturation_signal;
-    saturation_signal.value = checkSpeedSaturation(cmd_in);
+    auto [saturated, cmd_out] = m_limits.saturate(cmd_in);
+    saturation_signal.value = saturated;
     saturation_signal.time = cmd_in.time;
     _saturation_signal.write(saturation_signal);
-
-    commands::Joints cmd_out;
-    cmd_out.elements.resize(1);
-    cmd_out.elements[0].speed = clamp(cmd_in.elements[0].speed,
-        m_limits.elements[0].min.speed,
-        m_limits.elements[0].max.speed);
-
     cmd_out.time = Time::now();
     _cmd_out.write(cmd_out);
 }
