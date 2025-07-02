@@ -10,5 +10,6 @@
   <depend package="simulation/orogen/rock_gazebo"/>
   <depend package="control/uuv_tether_control"/>
   <depend package="control/orogen/control_base"/>
+  <depend package="drivers/orogen/linux_gpios"/>
   <test_depend name="tools/syskit" />
 </package>

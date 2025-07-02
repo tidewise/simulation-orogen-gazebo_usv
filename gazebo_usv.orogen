@@ -7,6 +7,7 @@ import_types_from "gazebo_usvTypes.hpp"
 import_types_from "std"
 import_types_from "base"
 import_types_from "control_base"
+import_types_from "linux_gpios"
 
 using_library "gazebo"
 using_library "base-logging"
@@ -90,4 +91,25 @@ task_context "ThrusterLimitationTask" do
     exception_states "INVALID_COMMAND_SIZE", "INVALID_COMMAND_PARAMETER"
 
     periodic 0.1
+end
+
+# Component to simulate the reed switch sensor behaviour
+# For each revolution cycle there is a range where the reed switch is triggered
+task_context "ReedSwitchSimulatorTask" do
+    needs_configuration
+
+    # The time for one cycle
+    property "revolution_time", "/base/Time"
+    # The reed swicth sensor is ON for the first trigger_time in each cycle
+    property "trigger_time", "/base/Time"
+
+    # The gpio state used to retract the system
+    input_port "gpio_retract", "/linux_gpios/GPIOState"
+    # The gpio state used to extend the system
+    input_port "gpio_extend", "/linux_gpios/GPIOState"
+    # The reed switch gpio state used to count revolutions
+    output_port "gpio_reed_switch", "/linux_gpios/GPIOState"
+
+    exception_states "INVALID_GPIO_SIZE"
+    periodic 0.01
 end
