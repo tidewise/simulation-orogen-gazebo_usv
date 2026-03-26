@@ -2,9 +2,9 @@
 #define GAZEBO_USV_WindSourceTask_TASK_HPP
 
 #include "gazebo_usv/WindSourceTaskBase.hpp"
-#include <gazebo/physics/physics.hh>
-#include <gazebo/transport/transport.hh>
-#include <gazebo/msgs/msgs.hh>
+
+#include <gz/sim/Entity.hh>
+#include <gz/transport.hh>
 
 namespace gazebo_usv{
 
@@ -25,14 +25,16 @@ namespace gazebo_usv{
     class WindSourceTask : public WindSourceTaskBase
     {
         friend class WindSourceTaskBase;
-        typedef gazebo::physics::ModelPtr ModelPtr;
 
     protected:
         std::string mModelName;
-        gazebo::transport::NodePtr mNode;
-        gazebo::transport::PublisherPtr mWindVelocityPublisher;
+        std::shared_ptr<gz::transport::Node> mNode;
+        gz::transport::Node::Publisher mWindVelocityPublisher;
     public:
-        void setGazeboModel( std::string const& pluginName, ModelPtr model );
+        virtual void setGazebo(gz::sim::Entity const& entity,
+            sdf::ElementConstPtr const& sdf,
+            gz::sim::EntityComponentManager& ecm,
+            gz::sim::EventManager& event_manager);
 
         /** TaskContext constructor for WindSourceTask
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.

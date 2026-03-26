@@ -3,25 +3,24 @@
 #include "DirectForceApplicationTask.hpp"
 
 #include <string>
-
-#include <gazebo/physics/Model.hh>
+#include <rock_gazebo/Helpers.hpp>
 
 using namespace gazebo_usv;
 
 DirectForceApplicationTask::DirectForceApplicationTask(std::string const& name)
     : DirectForceApplicationTaskBase(name)
 {
-    this->m_node = boost::make_shared<gazebo::transport::Node>();
-    this->m_node->Init();
 }
 
 DirectForceApplicationTask::~DirectForceApplicationTask()
 {
 }
 
-void DirectForceApplicationTask::setGazeboModel(std::string const& plugin_name, gazebo::physics::ModelPtr model) 
-{
-    m_model_name = getNamespaceFromPluginName(plugin_name);
+void DirectForceApplicationTask::setGazebo(gz::sim::Entity const& entity,
+    sdf::ElementConstPtr const& sdf,
+    gz::sim::EntityComponentManager& ecm,
+    gz::sim::EventManager& event_manager) {
+    throw std::runtime_error("not implemented");
 }
 
 
@@ -35,8 +34,11 @@ bool DirectForceApplicationTask::configureHook()
         return false;
     }
 
-    auto topic_name = m_model_name + "/" + _link_name.get() + "/gazebo_usv_force";
-    m_force_pub = m_node->Advertise<gazebo::msgs::Vector3d>("/" + topic_name);
+    rock_gazebo::GazeboSync sync(*this);
+
+    this->m_node = std::make_shared<gz::transport::Node>();
+    auto topic_name = "";
+    m_publisher = m_node->Advertise<gz::msgs::Vector3d>(topic_name);
 
     return true;
 }
@@ -57,12 +59,12 @@ void DirectForceApplicationTask::updateHook()
         return;
     }
 
-    gazebo::msgs::Vector3d msg;
+    gz::msgs::Vector3d msg;
     msg.set_x(force_cmd.x());
     msg.set_y(force_cmd.y());
     msg.set_z(force_cmd.z());
 
-    m_force_pub->Publish(msg);
+    m_publisher.Publish(msg);
 }
 void DirectForceApplicationTask::errorHook()
 {
@@ -75,6 +77,5 @@ void DirectForceApplicationTask::stopHook()
 void DirectForceApplicationTask::cleanupHook()
 {
     DirectForceApplicationTaskBase::cleanupHook();
-
-    m_force_pub->Fini();
+    m_node.reset();
 }

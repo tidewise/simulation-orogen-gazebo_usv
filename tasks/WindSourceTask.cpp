@@ -1,8 +1,6 @@
 #include "WindSourceTask.hpp"
-#include <regex>
 
 using namespace std;
-using namespace gazebo;
 using namespace gazebo_usv;
 
 WindSourceTask::WindSourceTask(std::string const &name)
@@ -24,17 +22,19 @@ bool WindSourceTask::configureHook()
         return false;
 
     // Set gazebo topic to advertise
-    mNode = transport::NodePtr(new transport::Node());
-    mNode->Init();
+    mNode.reset(new gz::transport::Node());
 
-    mWindVelocityPublisher = mNode->Advertise<gazebo::msgs::Vector3d>("/" + mModelName + "/wind_velocity");
+    mWindVelocityPublisher = mNode->Advertise<gz::msgs::Vector3d>("/" + mModelName + "/wind_velocity");
     gzmsg << "WindSourceTask: advertising to gazebo topic /" + mModelName + "/wind_velocity" << endl;
     return true;
 }
 
-void WindSourceTask::setGazeboModel(std::string const &pluginName, ModelPtr model)
-{
-    mModelName = getNamespaceFromPluginName(pluginName);
+void WindSourceTask::setGazebo(gz::sim::Entity const& entity,
+    sdf::ElementConstPtr const& sdf,
+    gz::sim::EntityComponentManager& ecm,
+    gz::sim::EventManager& event_manager) {
+
+    throw std::logic_error("not implemented error");
 }
 
 bool WindSourceTask::startHook()
@@ -53,11 +53,11 @@ void WindSourceTask::updateHook()
     wind_pose.velocity = wind_velocity;
     _wind_pose.write(wind_pose);
 
-    gazebo::msgs::Vector3d wind_vel_msg;
+    gz::msgs::Vector3d wind_vel_msg;
     wind_vel_msg.set_x(wind_velocity.x());
     wind_vel_msg.set_y(wind_velocity.y());
     wind_vel_msg.set_z(wind_velocity.z());
-    mWindVelocityPublisher->Publish(wind_vel_msg);
+    mWindVelocityPublisher.Publish(wind_vel_msg);
     WindSourceTaskBase::updateHook();
 }
 void WindSourceTask::errorHook()
@@ -70,11 +70,11 @@ void WindSourceTask::stopHook()
     wind_pose.velocity = Eigen::Vector3d::Zero();
     _wind_pose.write(wind_pose);
 
-    gazebo::msgs::Vector3d wind_vel_msg;
+    gz::msgs::Vector3d wind_vel_msg;
     wind_vel_msg.set_x(0);
     wind_vel_msg.set_y(0);
     wind_vel_msg.set_z(0);
-    mWindVelocityPublisher->Publish(wind_vel_msg);
+    mWindVelocityPublisher.Publish(wind_vel_msg);
     WindSourceTaskBase::stopHook();
 }
 void WindSourceTask::cleanupHook()
