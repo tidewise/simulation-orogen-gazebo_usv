@@ -1,0 +1,208 @@
+# frozen_string_literal: true
+
+name 'rock_gazebo'
+
+cxx_standard "c++17"
+
+import_types_from 'base'
+import_types_from 'rock_gazeboTypes.hpp'
+import_types_from 'gps_base'
+
+using_library 'base-logging'
+using_library 'gazebo'
+using_library 'gazebo_thruster'
+
+# Representation of a gazebo World object
+task_context 'WorldTask' do
+    needs_configuration
+
+    # The world full name
+    attribute 'name', '/std/string'
+
+    # The simulation time
+    output_port 'time', 'base/Time'
+end
+
+task_context 'BaseTask' do
+    needs_configuration
+
+    # Controls whether the components should use the simulation time (the
+    # default) or wall-clock time
+    property 'use_sim_time', '/bool', true
+end
+
+# Representation of a gazebo Model object
+task_context 'ModelTask', subclasses: 'BaseTask' do
+    needs_configuration
+
+    # How long will the task consider that a value received on the joints_cmd
+    # port is valid.
+    #
+    # Defaults to one second
+    property 'joint_command_timeout', '/base/Time'
+
+    # Whether the main joints_cmd input should have its names validated or not
+    #
+    # This controls only joints_cmd. Individually exported sets of joints can
+    # have different settings
+    property 'ignore_joint_names', '/bool', false
+
+    # How long will the task consider that a value received on a external link
+    # wrench port is valid.
+    #
+    # Defaults to one second
+    property 'wrench_command_timeout', '/base/Time'
+
+    # The model full name
+    attribute 'name', '/std/string'
+
+    # The frame name for the model pose. It will, by default, be set to the
+    # model's name (e.g. flat_fish)
+    property 'model_frame', '/std/string'
+    # The frame name for the model pose. It will, by default, be set to the
+    # world's full name (e.g. underwater)
+    property 'world_frame', '/std/string'
+    # The pose of the model w.r.t. the world frame
+    output_port 'pose_samples', '/base/samples/RigidBodyState'
+    # The covariance matrix to be used as position covariance. Default is unset (NaN)
+    property 'cov_position', '/base/Matrix3d'
+    # The covariance matrix to be used as orientation covariance. Default is unset (NaN)
+    property 'cov_orientation', '/base/Matrix3d'
+    # The covariance matrix to be used as velocity covariance. Default is unset (NaN)
+    property 'cov_velocity', '/base/Matrix3d'
+    # The covariance matrix to be used as angular velocity covariance. Default
+    # is unset (NaN)
+    property 'cov_angular_velocity', '/base/Matrix3d'
+
+    property 'exported_links', 'std/vector<rock_gazebo/LinkExport>'
+    property 'exported_joints', 'std/vector<rock_gazebo/JointExport>'
+
+
+    # The model's pose if one wants to "warp"
+    input_port 'model_pose', '/base/samples/RigidBodyState'
+
+    # Joints input/output ports
+    input_port 'joints_cmd', '/base/samples/Joints'
+    output_port 'joints_samples', '/base/samples/Joints'
+    # Link export
+    dynamic_input_port(/_wrench$/, '/base/samples/Wrench')
+    dynamic_output_port(/.*/, '/base/samples/RigidBodyState')
+    dynamic_output_port(/_acceleration$/, '/base/samples/RigidBodyAcceleration')
+    dynamic_input_port(/_cmd$/, '/base/samples/Joints')
+    dynamic_output_port(/_samples$/, '/base/samples/Joints')
+
+    exception_states 'INVALID_JOINT_COMMAND'
+end
+
+task_context 'ModelPluginTask', subclasses: 'BaseTask' do
+    abstract
+    needs_configuration
+    attribute 'name', '/std/string'
+end
+
+task_context 'UnderwaterTask', subclasses: 'ModelPluginTask' do
+    needs_configuration
+
+    exception_states 'NO_TOPIC_CONNECTION'
+
+    # Water velocity input port
+    input_port 'fluid_velocity', '/base/Vector3d'
+end
+
+task_context 'ThrusterTask', subclasses: 'ModelPluginTask' do
+    needs_configuration
+
+    exception_states 'NO_TOPIC_CONNECTION', 'NO_JOINT_NAMES'
+
+    # Thruster input port
+    input_port 'thrusters_cmd', '/base/samples/Joints'
+    # Thruster status port
+    output_port 'joint_samples', '/base/samples/Joints'
+end
+
+task_context 'SensorTask', subclasses: 'BaseTask' do
+    abstract
+
+    # The sensor's full name
+    attribute 'name', '/std/string'
+end
+
+task_context 'LaserScanTask', subclasses: 'SensorTask' do
+    # Laser line output port
+    output_port 'laser_scan_samples', '/base/samples/LaserScan'
+    # Depth map output port
+    output_port 'depth_map_samples', '/base/samples/DepthMap'
+end
+
+task_context 'CameraTask', subclasses: 'SensorTask' do
+    # Camera output port
+    output_port 'frame', ro_ptr('base::samples::frame::Frame')
+end
+
+task_context 'ImuTask', subclasses: 'SensorTask' do
+    # The name of the frame attached to the IMU'
+    property('imu_frame', '/std/string', 'imu')
+
+    # The name of the world frame'
+    property('world_frame', '/std/string', 'imu_world')
+
+    # The orientation covariance
+    property('cov_orientation', '/base/Matrix3d')
+
+    # The orientation covariance
+    property('cov_angular_velocity', '/base/Matrix3d')
+
+    # The reference of the orientation samples
+    property 'reference', '/rock_gazebo/IMUReference', 'REFERENCE_INITIAL_POSE'
+
+    # Provides orientation samples reported by the IMU sensor.'
+    output_port('orientation_samples', '/base/samples/RigidBodyState')
+
+    # IMU samples containing linear acceleration, orientation and angular velocity
+    output_port('imu_samples', '/base/samples/IMUSensors')
+end
+
+task_context 'GPSTask', subclasses: 'SensorTask' do
+    # The name of the frame attached to the GPS'
+    property('gps_frame', '/std/string', 'gps')
+
+    # The name of the reference frame for the UTM samples
+    property('utm_frame', '/std/string', 'utm')
+
+    # The name of the reference frame for the position samples
+    property('nwu_frame', '/std/string', 'nwu')
+
+    # Use a proper transverse mercator projection or Gazebo's
+    # internal SphericalCoordinate conversion class
+    #
+    # If you intend to compare true positions provided by ModelTask to things
+    # that use the GPS, this must be false
+    property('use_proper_utm_conversion', 'bool', false)
+
+    # The raw GPS position
+    output_port 'gps_solution', 'gps_base/Solution'
+
+    # Computed UTM position
+    output_port 'utm_samples', '/base/samples/RigidBodyState'
+
+    # Computed position in m, in the NWU coordinate frame
+    output_port 'position_samples', '/base/samples/RigidBodyState'
+
+    # UTM zone for conversion of WGS84 to UTM if use_proper_utm_conversion is
+    # true
+    property('utm_zone', 'int', 32)
+
+    # UTM north for conversion of WGS84 to UTM if use_proper_utm_conversion is
+    # true
+    property('utm_north', 'bool', true)
+
+    # Origin in UTM coordinates, that is used for position readings if
+    # use_proper_utm_conversion is true
+    property('nwu_origin', '/base/Position')
+
+    # Latitude of the origin if use_proper_utm_conversion is false
+    property('latitude_origin', '/base/Angle')
+
+    # Longitude of the origin if use_proper_utm_conversion is false
+    property('longitude_origin', '/base/Angle')
+end

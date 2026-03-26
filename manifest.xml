@@ -1,6 +1,6 @@
 <package>
   <description brief="Orogen package for Gazebo USV plugins">
-  
+
   </description>
   <author>Jhonas Prado Moura/jhonas.moura@tidewise.io</author>
   <license></license>
@@ -8,6 +8,7 @@
   <logo>http://</logo>
   <depend package="base/cmake" />
   <depend package="simulation/orogen/rock_gazebo"/>
+  <depend package="simulation/gazebo_usv"/>
   <depend package="control/uuv_tether_control"/>
   <depend package="control/orogen/control_base"/>
   <depend package="drivers/orogen/linux_gpios"/>

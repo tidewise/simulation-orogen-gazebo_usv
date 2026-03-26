@@ -1,7 +1,7 @@
 name "gazebo_usv"
 
-# If new data types need to be defined, they have to be put in a separate C++
-# header, and this header will be loaded here
+cxx_standard "c++17"
+
 import_types_from "gazebo_usvTypes.hpp"
 
 import_types_from "std"
@@ -9,14 +9,25 @@ import_types_from "base"
 import_types_from "control_base"
 import_types_from "linux_gpios"
 
-using_library "gazebo"
-using_library "base-logging"
+using_library "base-logging", typekit: false
 using_library "uuv_tether_control"
+using_library "gazebo_usv", typekit: false
 import_types_from "uuv_tether_control/TetherDragAndInertiaConfig.hpp"
 import_types_from "uuv_tether_control/TetherDragAndInertiaState.hpp"
 using_task_library "rock_gazebo"
 
-task_context 'WindSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
+task_context 'ThrusterTask', subclasses: 'rock_gazebo::BaseTask' do
+    needs_configuration
+
+    exception_states 'NO_TOPIC_CONNECTION', 'NO_JOINT_NAMES'
+
+    # Thruster input port
+    input_port 'thrusters_cmd', '/base/samples/Joints'
+    # Thruster status port
+    output_port 'joint_samples', '/base/samples/Joints'
+end
+
+task_context 'WindSourceTask', subclasses: 'rock_gazebo::BaseTask' do
     needs_configuration
 
     exception_states 'NO_TOPIC_CONNECTION'
@@ -28,7 +39,7 @@ task_context 'WindSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
     output_port 'wind_pose', '/base/samples/RigidBodyState'
 end
 
-task_context 'WaveSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
+task_context 'WaveSourceTask', subclasses: 'rock_gazebo::BaseTask' do
     needs_configuration
 
     exception_states 'NO_TOPIC_CONNECTION'
@@ -37,7 +48,7 @@ task_context 'WaveSourceTask', subclasses: 'rock_gazebo::ModelPluginTask' do
     input_port 'wave_attributes', '/gazebo_usv/WaveAttributes'
 end
 
-task_context "DirectForceApplicationTask", subclasses: "rock_gazebo::ModelPluginTask" do
+task_context "DirectForceApplicationTask", subclasses: "rock_gazebo::BaseTask" do
     needs_configuration
 
     # The link name follows the format: "${model}/${link}"
@@ -58,10 +69,10 @@ task_context 'TetherSimulationTask' do
     # The rov's link where the tether is attached
     input_port 'rov_attachment', '/base/samples/RigidBodyState'
 
-    # The usv's link where the tether is attached   
+    # The usv's link where the tether is attached
     input_port 'usv_attachment', '/base/samples/RigidBodyState'
 
-    # Water speed over ground, expressed in the rov 
+    # Water speed over ground, expressed in the rov
     input_port 'water_speed', '/base/Vector3d'
 
     output_port 'rov_force', 'base/Vector3d'

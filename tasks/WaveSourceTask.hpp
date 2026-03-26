@@ -2,9 +2,9 @@
 #define GAZEBO_USV_WaveSourceTask_TASK_HPP
 
 #include "gazebo_usv/WaveSourceTaskBase.hpp"
-#include <gazebo/msgs/msgs.hh>
-#include <gazebo/physics/physics.hh>
-#include <gazebo/transport/transport.hh>
+
+#include <gz/gazebo_usv/wave.pb.h>
+#include <gz/transport.hh>
 
 namespace gazebo_usv {
 
@@ -28,17 +28,17 @@ namespace gazebo_usv {
      */
     class WaveSourceTask : public WaveSourceTaskBase {
         friend class WaveSourceTaskBase;
-        typedef gazebo::physics::ModelPtr ModelPtr;
 
     protected:
         std::string m_model_name;
-        gazebo::transport::NodePtr m_node;
-        gazebo::transport::PublisherPtr m_wave_amplitude_publisher;
-        gazebo::transport::PublisherPtr m_wave_frequency_publisher;
-        gazebo::transport::PublisherPtr m_roll_publisher;
+        std::shared_ptr<gz::transport::Node> m_node;
+        gz::transport::Node::Publisher m_publisher;
 
     public:
-        void setGazeboModel(std::string const& pluginName, ModelPtr model);
+        void setGazebo(gz::sim::Entity const& entity,
+            sdf::ElementConstPtr const& sdf,
+            gz::sim::EntityComponentManager& ecm,
+            gz::sim::EventManager& event_manager) override;
 
         /** TaskContext constructor for WaveSourceTask
          * \param name Name of the task. This name needs to be unique to make it
