@@ -1,4 +1,10 @@
 #include "WindSourceTask.hpp"
+#include <gazebo_usv/Components.hpp>
+#include <rock_gazebo/Helpers.hpp>
+
+#include <base-logging/Logging.hpp>
+#include <gz/sim/Util.hh>
+
 
 using namespace std;
 using namespace gazebo_usv;
@@ -22,11 +28,36 @@ bool WindSourceTask::configureHook()
         return false;
 
     // Set gazebo topic to advertise
-    mNode.reset(new gz::transport::Node());
+    auto topic_name = resolveTopicName();
 
-    mWindVelocityPublisher = mNode->Advertise<gz::msgs::Vector3d>("/" + mModelName + "/wind_velocity");
-    gzmsg << "WindSourceTask: advertising to gazebo topic /" + mModelName + "/wind_velocity" << endl;
+    rock_gazebo::GazeboSync sync(*this);
+    m_node = std::make_shared<gz::transport::Node>();
+    gzmsg << "WaveSourceTask: advertising to gazebo topic " + topic_name
+          << endl;
+    m_publisher = m_node->Advertise<gz::msgs::Vector3d>(topic_name);
+
     return true;
+}
+
+std::string WindSourceTask::resolveTopicName() {
+    base::Time deadline = base::Time::now() + base::Time::fromSeconds(5);
+    while (base::Time::now() < deadline) {
+        {
+            rock_gazebo::GazeboSync sync(*this);
+
+            optional<string> topic_name =
+                m_ecm->ComponentData<gazebo_usv::WindSpeedTopic>(m_entity);
+            if (topic_name.has_value()) {
+                return *topic_name;
+            }
+        }
+
+        this_thread::sleep_for(chrono::milliseconds(100));
+    }
+
+    LOG_ERROR_S << "could not find topic name for WindSourceTask attached to "
+                << gz::sim::scopedName(m_entity, *m_ecm, "::", false);
+    throw std::logic_error("no wind plugin attached to given model");
 }
 
 void WindSourceTask::setGazebo(gz::sim::Entity const& entity,
@@ -34,7 +65,10 @@ void WindSourceTask::setGazebo(gz::sim::Entity const& entity,
     gz::sim::EntityComponentManager& ecm,
     gz::sim::EventManager& event_manager) {
 
-    throw std::logic_error("not implemented error");
+    BaseTask::setGazebo(entity, sdf, ecm, event_manager);
+
+    m_entity = entity;
+    m_ecm = &ecm;
 }
 
 bool WindSourceTask::startHook()
@@ -57,7 +91,7 @@ void WindSourceTask::updateHook()
     wind_vel_msg.set_x(wind_velocity.x());
     wind_vel_msg.set_y(wind_velocity.y());
     wind_vel_msg.set_z(wind_velocity.z());
-    mWindVelocityPublisher.Publish(wind_vel_msg);
+    m_publisher.Publish(wind_vel_msg);
     WindSourceTaskBase::updateHook();
 }
 void WindSourceTask::errorHook()
@@ -74,7 +108,7 @@ void WindSourceTask::stopHook()
     wind_vel_msg.set_x(0);
     wind_vel_msg.set_y(0);
     wind_vel_msg.set_z(0);
-    mWindVelocityPublisher.Publish(wind_vel_msg);
+    m_publisher.Publish(wind_vel_msg);
     WindSourceTaskBase::stopHook();
 }
 void WindSourceTask::cleanupHook()

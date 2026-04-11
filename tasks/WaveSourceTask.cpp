@@ -1,6 +1,9 @@
 #include "WaveSourceTask.hpp"
-
+#include <gazebo_usv/Components.hpp>
 #include <rock_gazebo/Helpers.hpp>
+
+#include <base-logging/Logging.hpp>
+#include <gz/sim/Util.hh>
 
 using namespace std;
 using namespace gazebo_usv;
@@ -23,18 +26,37 @@ bool WaveSourceTask::configureHook()
     if (!WaveSourceTaskBase::configureHook())
         return false;
 
-    rock_gazebo::GazeboSync sync(*this);
-
     // Set gazebo topic to advertise
-    m_node.reset(new gz::transport::Node());
+    auto topic_name = resolveTopicName();
 
-    m_publisher =
-        m_node->Advertise<gz::gazebo_usv::Wave>("/" + m_model_name + "/wave_amplitude");
-    gzmsg << "WaveSourceTask: advertising to gazebo topic /" + m_model_name +
-                 "/wave_amplitude"
+    rock_gazebo::GazeboSync sync(*this);
+    m_node = std::make_shared<gz::transport::Node>();
+    gzmsg << "WaveSourceTask: advertising to gazebo topic " + topic_name
           << endl;
+    m_publisher = m_node->Advertise<gz::gazebo_usv::Wave>(topic_name);
 
     return true;
+}
+
+std::string WaveSourceTask::resolveTopicName() {
+    base::Time deadline = base::Time::now() + base::Time::fromSeconds(5);
+    while (base::Time::now() < deadline) {
+        {
+            rock_gazebo::GazeboSync sync(*this);
+
+            optional<string> topic_name =
+                m_ecm->ComponentData<gazebo_usv::WaveParametersTopic>(m_entity);
+            if (topic_name.has_value()) {
+                return *topic_name;
+            }
+        }
+
+        this_thread::sleep_for(chrono::milliseconds(100));
+    }
+
+    LOG_ERROR_S << "could not find topic name for WaveSourceTask attached to "
+                << gz::sim::scopedName(m_entity, *m_ecm, "::", false);
+    throw std::logic_error("no wave plugin attached to given model");
 }
 
 void WaveSourceTask::setGazebo(gz::sim::Entity const& entity,
@@ -42,7 +64,10 @@ void WaveSourceTask::setGazebo(gz::sim::Entity const& entity,
     gz::sim::EntityComponentManager& ecm,
     gz::sim::EventManager& event_manager) {
 
-    throw std::logic_error("not implemented error");
+    BaseTask::setGazebo(entity, sdf, ecm, event_manager);
+
+    m_entity = entity;
+    m_ecm = &ecm;
 }
 
 bool WaveSourceTask::startHook()

@@ -30,9 +30,12 @@ namespace gazebo_usv {
         friend class WaveSourceTaskBase;
 
     protected:
-        std::string m_model_name;
+        gz::sim::Entity m_entity = gz::sim::kNullEntity;
+        gz::sim::EntityComponentManager* m_ecm = nullptr;
         std::shared_ptr<gz::transport::Node> m_node;
         gz::transport::Node::Publisher m_publisher;
+
+        std::string resolveTopicName();
 
     public:
         void setGazebo(gz::sim::Entity const& entity,
