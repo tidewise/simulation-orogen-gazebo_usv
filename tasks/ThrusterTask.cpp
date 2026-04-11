@@ -35,6 +35,16 @@ bool ThrusterTask::configureHook()
         m_node = std::make_shared<gz::transport::Node>();
     }
 
+    auto topic_name = resolveTopicName();
+
+    rock_gazebo::GazeboSync sync(*this);
+    gzmsg << "ThrusterTask: advertising to gazebo topic " + topic_name
+          << endl;
+    m_publisher = m_node->Advertise<gz::gazebo_usv::Thrusters>(topic_name);
+    return true;
+}
+
+std::string ThrusterTask::resolveTopicName() {
     base::Time deadline = base::Time::now() + base::Time::fromSeconds(5);
     while (base::Time::now() < deadline) {
         {
@@ -43,23 +53,21 @@ bool ThrusterTask::configureHook()
             optional<string> topic_name =
                 m_ecm->ComponentData<gazebo_usv::ThrustersTopic>(m_entity);
             if (topic_name.has_value()) {
-                gzmsg << "ThrusterTask: advertising to gazebo topic " + *topic_name
-                      << endl;
-                m_publisher = m_node->Advertise<gz::gazebo_usv::Thrusters>(*topic_name);
-                break;
+                auto resolved = topic_name.value();
+                if (m_subtopic.empty()) {
+                    return resolved;
+                }
+
+                return resolved + "/" + m_subtopic;
             }
         }
 
         this_thread::sleep_for(chrono::milliseconds(100));
     }
 
-    if (!m_publisher.Valid()) {
-        LOG_ERROR_S << "could not find topic name for ThrusterTask attached to "
-                    << gz::sim::scopedName(m_entity, *m_ecm, "::", false);
-        return false;
-    }
-
-    return true;
+    LOG_ERROR_S << "could not find topic name for ThrusterTask attached to "
+                << gz::sim::scopedName(m_entity, *m_ecm, "::", false);
+    throw std::logic_error("no thrusters plugin attached to given model");
 }
 
 bool ThrusterTask::startHook()
@@ -132,4 +140,5 @@ void ThrusterTask::setGazebo(gz::sim::Entity const& entity,
 
     m_entity = entity;
     m_ecm = &ecm;
+    m_subtopic = sdf->Get<std::string>("topic", "").first;
 }
