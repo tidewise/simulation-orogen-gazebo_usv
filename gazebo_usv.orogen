@@ -39,6 +39,15 @@ task_context 'WindSourceTask', subclasses: 'rock_gazebo::BaseTask' do
     output_port 'wind_pose', '/base/samples/RigidBodyState'
 end
 
+task_context 'WaterCurrentSourceTask', subclasses: 'rock_gazebo::BaseTask' do
+    needs_configuration
+
+    exception_states 'NO_TOPIC_CONNECTION'
+
+    # Wind velocity input port
+    input_port 'water_velocity_target', '/base/Vector3d'
+end
+
 task_context 'WaveSourceTask', subclasses: 'rock_gazebo::BaseTask' do
     needs_configuration
 
