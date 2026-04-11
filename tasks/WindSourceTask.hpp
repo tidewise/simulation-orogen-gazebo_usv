@@ -27,9 +27,13 @@ namespace gazebo_usv{
         friend class WindSourceTaskBase;
 
     protected:
-        std::string mModelName;
-        std::shared_ptr<gz::transport::Node> mNode;
-        gz::transport::Node::Publisher mWindVelocityPublisher;
+        gz::sim::Entity m_entity = gz::sim::kNullEntity;
+        gz::sim::EntityComponentManager* m_ecm = nullptr;
+        std::shared_ptr<gz::transport::Node> m_node;
+        gz::transport::Node::Publisher m_publisher;
+
+        std::string resolveTopicName();
+
     public:
         virtual void setGazebo(gz::sim::Entity const& entity,
             sdf::ElementConstPtr const& sdf,
