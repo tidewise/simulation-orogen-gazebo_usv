@@ -34,10 +34,13 @@ namespace gazebo_usv {
             gz::sim::EventManager& event_manager) override;
 
     private:
+        std::string resolveTopicName();
+
         gz::sim::Entity m_entity = gz::sim::kNullEntity;
         gz::sim::EntityComponentManager* m_ecm = nullptr;
         std::shared_ptr<gz::transport::Node> m_node;
         gz::transport::Node::Publisher m_publisher;
+        std::string m_subtopic;
     };
 }
 
