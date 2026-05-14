@@ -53,14 +53,25 @@ describe OroGen.gazebo_usv.RudderActuatorPositionToAnalogTask do
         end
     end
 
-    def make_joints(fields, now: Time.now)
+    it "emits INVALID_POSITION_SAMPLE if input sample elements size is not 1" do
+        syskit_configure_and_start(@task)
+
+        sample = make_joints(speed: -0.5, size: 2)
+        expect_execution do
+            syskit_write @task.position_samples_port, sample
+        end.to do
+            emit task.invalid_position_sample_event
+        end
+    end
+
+    def make_joints(now: Time.now, size: 1, **fields)
         joint_state = Types.base.JointState.new(
             fields
         )
 
         joints = Types.base.samples.Joints.new(
             time: now,
-            elements: [joint_state]
+            elements: [joint_state] * size
         )
         joints
     end

@@ -40,13 +40,13 @@ void RudderActuatorPositionToAnalogTask::updateHook()
         return;
     }
 
-    if (m_position.elements.empty() || !m_position.elements[0].hasPosition()) {
+    if (m_position.elements.size() != 1 || !m_position.elements[0].hasPosition()) {
         return exception(INVALID_POSITION_SAMPLE);
     }
 
-    float position = m_position.elements[0].position;
+    double position = m_position.elements[0].position;
 
-    float analog_value =
+    double analog_value =
         m_analog_min + (position - m_position_min) * m_analog_per_length_ratio;
 
     m_analog_out[0].time = m_position.time;
