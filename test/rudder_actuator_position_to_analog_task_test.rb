@@ -19,15 +19,15 @@ describe OroGen.gazebo_usv.RudderActuatorPositionToAnalogTask do
 
         position = make_joints(position: 0.1)
         analog = expect_execution { syskit_write @task.position_samples_port, position }
-                   .to { have_one_new_sample task.analog_input_port }
+                   .to { have_one_new_sample task.analog_out_port }
 
         assert_equal position.time, analog[0].time
         assert_in_delta 0.1, analog[0].data
     end
 
     it "converts the position using the provided min/max values" do
-        @task.properties.input_min = 200
-        @task.properties.input_max = 400
+        @task.properties.analog_min = 200
+        @task.properties.analog_max = 400
         @task.properties.position_min = -1
         @task.properties.position_max = 1
 
@@ -37,7 +37,7 @@ describe OroGen.gazebo_usv.RudderActuatorPositionToAnalogTask do
         analog =
             expect_execution do
                 syskit_write @task.position_samples_port, position
-            end.to { have_one_new_sample task.analog_input_port }
+            end.to { have_one_new_sample task.analog_out_port }
 
         assert_in_delta 250.0, analog[0].data
     end

@@ -11,13 +11,12 @@ namespace gazebo_usv {
         friend class RudderActuatorPositionToAnalogTaskBase;
 
     protected:
-        float m_input_min;
-        float m_input_max;
+        float m_analog_min;
         float m_position_min;
-        float m_position_max;
+        float m_analog_per_length_ratio;
 
         base::samples::Joints m_position;
-        std::vector<raw_io::Analog> m_analog_input;
+        std::vector<raw_io::Analog> m_analog_out;
 
     public:
         RudderActuatorPositionToAnalogTask(

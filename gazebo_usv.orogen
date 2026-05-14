@@ -120,16 +120,16 @@ task_context "RudderActuatorPositionToAnalogTask" do
     needs_configuration
 
     # The analog input when the position is the minimun
-    property "input_min", "/float", -1
+    property "analog_min", "/float", -1
     # The analog input when the position is the maximum
-    property "input_max", "/float", 1
+    property "analog_max", "/float", 1
     # The minimum position
     property "position_min", "/float", -1
     # The maximum position
     property "position_max", "/float", 1
 
     # The analog readings
-    output_port "analog_input", "/std/vector</raw_io/Analog>"
+    output_port "analog_out", "/std/vector</raw_io/Analog>"
     # The position samples
     input_port "position_samples", "/base/samples/Joints"
 
