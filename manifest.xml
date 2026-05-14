@@ -11,5 +11,6 @@
   <depend package="control/uuv_tether_control"/>
   <depend package="control/orogen/control_base"/>
   <depend package="drivers/orogen/linux_gpios"/>
+  <depend package="drivers/orogen/raw_io" />
   <test_depend name="tools/syskit" />
 </package>

@@ -8,6 +8,7 @@ import_types_from "std"
 import_types_from "base"
 import_types_from "control_base"
 import_types_from "linux_gpios"
+import_types_from "raw_io"
 
 using_library "gazebo"
 using_library "base-logging"
@@ -112,4 +113,27 @@ task_context "ReedSwitchSimulatorTask" do
 
     exception_states "INVALID_GPIO_SIZE"
     periodic 0.01
+end
+
+# Task that computes the analog feedback based on the rudder's linear position
+task_context "RudderActuatorPositionToAnalogTask" do
+    needs_configuration
+
+    # The analog input when the position is the minimun
+    property "analog_min", "/float", -1
+    # The analog input when the position is the maximum
+    property "analog_max", "/float", 1
+    # The minimum position
+    property "position_min", "/float", -1
+    # The maximum position
+    property "position_max", "/float", 1
+
+    # The analog readings
+    output_port "analog_out", "/std/vector</raw_io/Analog>"
+    # The position samples
+    input_port "position_samples", "/base/samples/Joints"
+
+    exception_states "INVALID_POSITION_SAMPLE"
+
+    port_driven
 end
