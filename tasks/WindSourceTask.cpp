@@ -32,7 +32,7 @@ bool WindSourceTask::configureHook()
 
     rock_gazebo::GazeboSync sync(*this);
     m_node = std::make_shared<gz::transport::Node>();
-    gzmsg << "WaveSourceTask: advertising to gazebo topic " + topic_name
+    gzmsg << "WindSourceTask: advertising to gazebo topic " + topic_name
           << endl;
     m_publisher = m_node->Advertise<gz::msgs::Vector3d>(topic_name);
 
