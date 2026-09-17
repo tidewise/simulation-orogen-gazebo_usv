@@ -43,6 +43,7 @@ bool WaterCurrentSourceTask::configureHook()
     m_publisher = m_node->Advertise<gz::msgs::Vector3d>(m_topic_name);
     if (!m_publisher) {
         exception(NO_TOPIC_CONNECTION);
+        return false;
     }
     return true;
 }
