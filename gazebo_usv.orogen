@@ -45,7 +45,15 @@ task_context 'WaterCurrentSourceTask', subclasses: 'rock_gazebo::BaseTask' do
 
     exception_states 'NO_TOPIC_CONNECTION'
 
-    # Wind velocity input port
+    # The topic namespace as defined in the gazebo model in the
+    # hydrodynamics plugin. Quote from gazebo documentation:
+    # "<namespace> - If set, the plugin subscribes to
+    # /model/<namespace>/ocean_current instead of /ocean_current.
+    # Useful for per-vehicle currents in multi-robot
+    # scenarios. [string, optional]"
+    property 'topic_namespace', '/std/string'
+
+    # Water velocity input port
     input_port 'water_velocity_target', '/base/Vector3d'
 end
 
