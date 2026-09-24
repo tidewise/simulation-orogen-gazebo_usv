@@ -43,7 +43,7 @@ end
 task_context 'WaterCurrentSourceTask', subclasses: 'rock_gazebo::BaseTask' do
     needs_configuration
 
-    exception_states 'NO_TOPIC_CONNECTION'
+    exception_states 'NODE_FAILED_TO_ADVERTISE_TOPIC'
 
     # The topic namespace as defined in the gazebo model in the
     # hydrodynamics plugin. Quote from gazebo documentation:

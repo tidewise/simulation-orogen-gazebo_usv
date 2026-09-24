@@ -33,16 +33,16 @@ bool WaterCurrentSourceTask::configureHook()
         return false;
 
     std::string const topic_namespace = _topic_namespace.get();
-    m_topic_name = topic_namespace.empty() ? "/ocean_current" :
+    std::string topic_name = topic_namespace.empty() ? "/ocean_current" :
         "/model/" + topic_namespace + "/ocean_current";
 
     m_node = std::make_shared<gz::transport::Node>();
-    gzmsg << "WaterCurrentSourceTask: advertising to gazebo topic " + m_topic_name
+    gzmsg << "WaterCurrentSourceTask: advertising to gazebo topic " + topic_name
           << std::endl;
 
-    m_publisher = m_node->Advertise<gz::msgs::Vector3d>(m_topic_name);
+    m_publisher = m_node->Advertise<gz::msgs::Vector3d>(topic_name);
     if (!m_publisher) {
-        exception(NO_TOPIC_CONNECTION);
+        exception(NODE_FAILED_TO_ADVERTISE_TOPIC);
         return false;
     }
     return true;

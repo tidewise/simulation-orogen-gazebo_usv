@@ -30,7 +30,6 @@ namespace gazebo_usv{
         gz::sim::EntityComponentManager* m_ecm = nullptr;
         std::shared_ptr<gz::transport::Node> m_node;
         gz::transport::Node::Publisher m_publisher;
-        std::string m_topic_name;
 
         std::string resolveTopicName();
 
