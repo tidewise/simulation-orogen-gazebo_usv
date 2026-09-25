@@ -110,4 +110,3 @@ namespace gazebo_usv{
 }
 
 #endif
-
